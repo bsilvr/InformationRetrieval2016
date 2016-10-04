@@ -11,4 +11,17 @@ package ire;
  */
 public class Indexer {
     
+    private Index index;
+    
+    public Indexer(){
+        index = new Index();
+    }
+    
+    public Indexer(Index idx){
+        index = idx;
+    }
+    
+    public void indexDocument(Document doc){
+        
+    }
 }

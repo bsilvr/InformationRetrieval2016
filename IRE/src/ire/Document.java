@@ -10,5 +10,38 @@ package ire;
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class Document {
+    static String tmpPath = "./documents/";
+    static int id = 0;
+    
+    String filePath;
+    int docStartLine;
+    
+    int docId;
+    String documentPath;
+    
+    public Document(String filePath, int docStartLine){
+        this.docId = Document.id++;
+        this.filePath = filePath;
+        this.docStartLine = docStartLine;
+        this.documentPath = tmpPath + "doc_" + id;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public int getDocStartLine() {
+        return docStartLine;
+    }
+
+    public int getDocId() {
+        return docId;
+    }
+
+    public String getDocumentPath() {
+        return documentPath;
+    }
+    
+    
     
 }

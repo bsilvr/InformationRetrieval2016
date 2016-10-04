@@ -10,5 +10,18 @@ package ire;
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class Searcher {
+    Index index;
+    
+    public Searcher(){
+        index = new Index();
+    }
+    
+    public Searcher(Index idx){
+        index = idx;
+    }
+    
+    public Dictionary searchTerm(String term){
+        return index.searchTerm(term);
+    }
     
 }
