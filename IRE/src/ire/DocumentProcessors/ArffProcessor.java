@@ -41,12 +41,14 @@ public class ArffProcessor {
                 }
                 String[] parts = line.split("\"");
                 Document doc = new Document(file.getPath(), nLine, Integer.parseInt(parts[0].substring(0, parts[0].length()-1)));
-                
-                PrintWriter writer = new PrintWriter(doc.getDocumentPath(), "UTF-8");
-                parts[1] = parts[1].replace("<e>", ""); // esta a dar erro aqui
+                File fl = new File(doc.getDocumentPath());
+                fl.getParentFile().mkdirs();
+                PrintWriter writer = new PrintWriter(fl, "UTF-8");
+                parts[1] = parts[1].replace("<e>", "");
                 parts[1] = parts[1].replace("</e>", "");
                 writer.println(parts[1]);
                 writer.close();
+                documents.add(doc);
             }
             // line is not visible here.
         } catch (IOException ex) {

@@ -7,6 +7,7 @@ package ire;
 
 import ire.DocumentProcessors.ArffProcessor;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  *
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 public class DocumentProcessor {
     
     private ArrayList<Document> documents;
+    private Iterator<Document> documentsIterator;
     
     public DocumentProcessor(){
         documents = new ArrayList<>();
@@ -26,16 +28,19 @@ public class DocumentProcessor {
         if(cfile.getExtension().equals("arff")){
             documents.addAll(ArffProcessor.process(cfile));
         }
+        
+        documentsIterator = documents.iterator();
     }
     
-/*    public void processArff(String path){
-        // Cada documentos desse ficheiro e guardar na pasta temporaria.
-        // Adiciona documento a arrayList
-        // Processa documento retirando tags, etc...
+    public ArrayList<Document> getDocuments() {
+        return documents;
     }
-*/    
-    public void writeFile(String document){
-        //Escreve para o ficheiro
+    
+    public Document getNextDocument(){
+        if(documentsIterator.hasNext()) {
+            return documentsIterator.next();
+        }
+        return null;
     }
     
 }

@@ -5,6 +5,15 @@
  */
 package ire;
 
+import ire.DocumentProcessors.ArffProcessor;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
@@ -18,16 +27,42 @@ public class IRE {
         // TODO code application logic here
         
         CorpusReader corpus = new CorpusReader();
+        DocumentProcessor docProc = new DocumentProcessor();
+        
+        File stopWords = new File("stopwords_en.txt");
+        ArrayList<String> stopWordsList = new ArrayList<>();
+        try(BufferedReader br = new BufferedReader(new FileReader(stopWords))) {
+            for(String line; (line = br.readLine()) != null; ) {
+                stopWordsList.add(line);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(ArffProcessor.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         corpus.readDir("sample_corpus");
-        
-        DocumentProcessor docProc = new DocumentProcessor();
         
         CorpusFile file = corpus.getNextFile();
         while(file != null){
             docProc.processDocument(file);
             file = corpus.getNextFile();
         }
+        
+        Document doc = docProc.getNextDocument();
+        while(doc != null){
+            
+            Tokenizer tokenizer = new Tokenizer(stopWordsList.toArray(new String[0]));
+            tokenizer.tokenize(doc);
+            
+            Token token = tokenizer.getNextToken();
+            while(token != null){
+                System.out.println(token.getTerm());
+                token = tokenizer.getNextToken();
+                
+            }
+            
+            doc = docProc.getNextDocument();
+        }
+        
     }
     
 }

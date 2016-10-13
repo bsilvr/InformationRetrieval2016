@@ -5,21 +5,77 @@
  */
 package ire;
 
+import ire.DocumentProcessors.ArffProcessor;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class Tokenizer {
     
+    static char [] ignoreExtensions = {'!','.','\'', '#','$','%','&','(',')','*','+',',','-','.','/',':',';','<','>','=','?','@','[',']','\\','^','_','´','`','}','{','~','|'};
+    private ArrayList<Token> tokens = new ArrayList<>();
+    private Iterator<Token> tokensIterator;
+    String [] stopWordsList;
+    
+    public Tokenizer(String [] stopWordsList){
+        this.stopWordsList = stopWordsList;
+    }
     
     public void tokenize(Document doc){
-        // le o documento
-        // Escreve para o ficheiro tokenizado
+        
+        File cf = new File(doc.getDocumentPath());
+        try(BufferedReader br = new BufferedReader(new FileReader(cf))) {
+            for(String line; (line = br.readLine()) != null; ) {
+                // process the line.
+                line = line.replace("-", " ");
+                String [] words = line.split("\\s+");
+                for(String w : words){
+                    String word = transform(w);
+                    if(word != null){
+                        Token tk = new Token(word, doc);
+                        tokens.add(tk);
+                    } 
+                }
+                
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(ArffProcessor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        tokensIterator = tokens.iterator();
     }
         
-    public String transform(String doc){
-        // Converte tudo para minusculas, steamming, stopword filter, etc
-        // stopwords em primeiro lugar senao siglas podem ser ser eliminadas.
+    public String transform(String term){
+        term = term.toLowerCase();
+        if(Arrays.asList(stopWordsList).contains(term)){
+            return null;
+        }
+        
+        term = term.replaceAll("\\p{P}", "");
+        if(term.length()<2){
+            return null;
+        }
+        return term;
+    }
+    
+    public ArrayList<Token> getTokens() {
+        return tokens;
+    }
+    
+    public Token getNextToken(){
+        if(tokensIterator.hasNext()) {
+            return tokensIterator.next();
+        }
         return null;
     }
 }

@@ -21,11 +21,12 @@ public class Document {
     String documentPath;
     
     public Document(String filePath, int docStartLine, int originalDocId){
-        this.docId = Document.id++;
+        this.docId = Document.id;
         this.filePath = filePath;
         this.docStartLine = docStartLine;
         this.documentPath = tmpPath + "doc_" + id;
         this.originalDocId = originalDocId;
+        Document.id++;
     }
 
     public String getFilePath() {
