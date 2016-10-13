@@ -5,6 +5,7 @@
  */
 package ire;
 
+import ire.DocumentProcessors.ArffProcessor;
 import java.util.ArrayList;
 
 /**
@@ -22,14 +23,17 @@ public class DocumentProcessor {
     
     public void processDocument(CorpusFile cfile){
         // Ver a extensao e enviar o path para a função adequada.
+        if(cfile.getExtension().equals("arff")){
+            documents.addAll(ArffProcessor.process(cfile));
+        }
     }
     
-    public void processArff(String path){
+/*    public void processArff(String path){
         // Cada documentos desse ficheiro e guardar na pasta temporaria.
         // Adiciona documento a arrayList
         // Processa documento retirando tags, etc...
     }
-    
+*/    
     public void writeFile(String document){
         //Escreve para o ficheiro
     }

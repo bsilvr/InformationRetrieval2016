@@ -9,9 +9,9 @@ package ire;
  *
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
-class CorpusFile {
-    String path;
-    String extension;
+public class CorpusFile {
+    private String path;
+    private String extension;
     
     public CorpusFile(String path, String extension){
         this.path = path;

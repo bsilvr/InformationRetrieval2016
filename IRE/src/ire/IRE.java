@@ -16,6 +16,18 @@ public class IRE {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        
+        CorpusReader corpus = new CorpusReader();
+        
+        corpus.readDir("sample_corpus");
+        
+        DocumentProcessor docProc = new DocumentProcessor();
+        
+        CorpusFile file = corpus.getNextFile();
+        while(file != null){
+            docProc.processDocument(file);
+            file = corpus.getNextFile();
+        }
     }
     
 }

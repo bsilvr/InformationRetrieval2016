@@ -15,15 +15,17 @@ public class Document {
     
     String filePath;
     int docStartLine;
+    int originalDocId;
     
     int docId;
     String documentPath;
     
-    public Document(String filePath, int docStartLine){
+    public Document(String filePath, int docStartLine, int originalDocId){
         this.docId = Document.id++;
         this.filePath = filePath;
         this.docStartLine = docStartLine;
         this.documentPath = tmpPath + "doc_" + id;
+        this.originalDocId = originalDocId;
     }
 
     public String getFilePath() {
