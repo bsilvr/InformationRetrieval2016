@@ -28,6 +28,7 @@ public class IRE {
         
         CorpusReader corpus = new CorpusReader();
         DocumentProcessor docProc = new DocumentProcessor();
+        Indexer indexer = new Indexer();
         
         File stopWords = new File("stopwords_en.txt");
         ArrayList<String> stopWordsList = new ArrayList<>();
@@ -55,14 +56,16 @@ public class IRE {
             
             Token token = tokenizer.getNextToken();
             while(token != null){
-                System.out.println(token.getTerm());
-                token = tokenizer.getNextToken();
+                //System.out.println(token.getTerm());
+                indexer.indexToken(token);
                 
+                token = tokenizer.getNextToken();
             }
             
             doc = docProc.getNextDocument();
         }
-        
+        indexer.writeIndex();
+        System.err.println("DONE!");
     }
     
 }

@@ -23,6 +23,10 @@ public class Posting {
         docs.add(doc);
     }
     
+    public boolean contains(int doc){
+        return docs.contains(doc);
+    }
+    
     public int postingListSize(){
          return docs.size();
     }
@@ -33,5 +37,15 @@ public class Posting {
     
     public ArrayList getAllPostings(){
         return docs;
+    }
+    
+    @Override
+    public String toString(){
+        String s = "";
+        for (int i : docs){
+            s += i + "-";
+        }
+        s = s.substring(0, s.length()-1);
+        return s;
     }
 }

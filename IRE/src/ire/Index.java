@@ -6,6 +6,7 @@
 package ire;
 
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  *
@@ -23,6 +24,13 @@ public class Index {
     public void addTerm(String term, int doc){
         // adiciona um termo no indice em que apareceu no doc.
         // se ja existir adicionar a posting list.
+        if(dict.containsKey(term.hashCode())){
+            Dictionary d = dict.get(term.hashCode());
+            d.addDocument(doc);
+            dict.replace(term.hashCode(), d);
+            return;
+        }
+        dict.put(term.hashCode(), new Dictionary(term, doc));
     }
     
     public Dictionary searchTerm(String term){
@@ -36,6 +44,18 @@ public class Index {
     
     public void removeDocument(String Term, int doc){
         // remove documento da posting list para aquele termo
+    }
+    
+    public int size(){
+        return dict.size();
+    }
+    
+    public Dictionary get(int key){
+        return dict.get(key);
+    }
+    
+    public Set<Integer> keySet(){
+        return dict.keySet();
     }
     
 }

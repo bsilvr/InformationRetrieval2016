@@ -10,12 +10,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.tartarus.snowball.ext.englishStemmer;
 
 /**
  *
@@ -27,6 +27,7 @@ public class Tokenizer {
     private ArrayList<Token> tokens = new ArrayList<>();
     private Iterator<Token> tokensIterator;
     String [] stopWordsList;
+    englishStemmer stemmer = new englishStemmer();
     
     public Tokenizer(String [] stopWordsList){
         this.stopWordsList = stopWordsList;
@@ -65,6 +66,13 @@ public class Tokenizer {
         if(term.length()<2){
             return null;
         }
+
+        // Stemming
+        stemmer.setCurrent(term);
+        if (stemmer.stem()){
+            return stemmer.getCurrent();
+        }
+        
         return term;
     }
     

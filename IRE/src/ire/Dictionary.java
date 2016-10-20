@@ -28,14 +28,27 @@ public class Dictionary {
     }
     
     public void addDocument(int doc){
-        this.postingList.addPosting(doc);
+        if(!postingList.contains(doc)){
+            this.postingList.addPosting(doc);
+            this.nDocs++;
+        }
+        // Futuramente guardar o termFrequency
     }
     
     public void removeDocument(int doc){
         this.postingList.removePosting(doc);
+        this.nDocs--;
     }
     
-    public Dictionary getTerm(){
-        return this;
+    public String getTerm(){
+        return this.term;
+    }
+    
+    public Posting getPostingList(){
+        return this.postingList;
+    }
+    
+    public int getnDocs(){
+        return this.nDocs;
     }
 }
