@@ -22,12 +22,36 @@ import java.util.logging.Logger;
 public class ArffProcessor {
     
    
-    public static ArrayList<Document> process(CorpusFile file){
-        ArrayList<Document> documents = new ArrayList<>();
+    public static String process(Document doc){
         
+        File cf = new File(doc.getFilePath());
+        
+        int nLine= doc.getDocStartLine();
+        int idx = 0;
+        try(BufferedReader br = new BufferedReader(new FileReader(cf))) {
+            for(String line; (line = br.readLine()) != null; ) {
+                // process the line.
+                idx++;
+                if(idx == nLine){
+                    String[] parts = line.split("\"");
+                    parts[1] = parts[1].replace("<e>", "");
+                    parts[1] = parts[1].replace("</e>", "");
+                    return parts[1];
+                }
+                
+            }
+            // line is not visible here.
+        } catch (IOException ex) {
+            Logger.getLogger(ArffProcessor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+    public static ArrayList<Document> identify(CorpusFile file){
+        ArrayList<Document> documents = new ArrayList<>();
         File cf = new File(file.getPath());
         
         boolean dataFound = false;
+        
         try(BufferedReader br = new BufferedReader(new FileReader(cf))) {
             int nLine = 0;
             for(String line; (line = br.readLine()) != null; ) {
@@ -41,13 +65,6 @@ public class ArffProcessor {
                 }
                 String[] parts = line.split("\"");
                 Document doc = new Document(file.getPath(), nLine, Integer.parseInt(parts[0].substring(0, parts[0].length()-1)));
-                File fl = new File(doc.getDocumentPath());
-                fl.getParentFile().mkdirs();
-                PrintWriter writer = new PrintWriter(fl, "UTF-8");
-                parts[1] = parts[1].replace("<e>", "");
-                parts[1] = parts[1].replace("</e>", "");
-                writer.println(parts[1]);
-                writer.close();
                 documents.add(doc);
             }
             // line is not visible here.

@@ -23,7 +23,7 @@ import org.tartarus.snowball.ext.englishStemmer;
  */
 public class Tokenizer {
     
-    static char [] ignoreExtensions = {'!','.','\'', '#','$','%','&','(',')','*','+',',','-','.','/',':',';','<','>','=','?','@','[',']','\\','^','_','´','`','}','{','~','|'};
+    static String special = "[!.\'#$%&()*+,-./:;<>=?@\\^_´`}{~|]";
     private ArrayList<Token> tokens = new ArrayList<>();
     private Iterator<Token> tokensIterator;
     String [] stopWordsList;
@@ -33,26 +33,19 @@ public class Tokenizer {
         this.stopWordsList = stopWordsList;
     }
     
-    public void tokenize(Document doc){
+    public void tokenize(String content, Document doc){
         
-        File cf = new File(doc.getDocumentPath());
-        try(BufferedReader br = new BufferedReader(new FileReader(cf))) {
-            for(String line; (line = br.readLine()) != null; ) {
-                // process the line.
-                line = line.replace("-", " ");
-                String [] words = line.split("\\s+");
-                for(String w : words){
-                    String word = transform(w);
-                    if(word != null){
-                        Token tk = new Token(word, doc);
-                        tokens.add(tk);
-                    } 
-                }
-                
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(ArffProcessor.class.getName()).log(Level.SEVERE, null, ex);
+
+        content = content.replace("-", " ");
+        String [] words = content.split("\\s+");
+        for(String w : words){
+            String word = transform(w);
+            if(word != null){
+                Token tk = new Token(word, doc);
+                tokens.add(tk);
+            } 
         }
+                
         tokensIterator = tokens.iterator();
     }
         
@@ -62,7 +55,7 @@ public class Tokenizer {
             return null;
         }
         
-        term = term.replaceAll("\\p{P}", "");
+        term = term.replaceAll("\\W", "");
         if(term.length()<2){
             return null;
         }

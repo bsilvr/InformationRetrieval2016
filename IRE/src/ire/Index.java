@@ -7,6 +7,9 @@ package ire;
 
 import java.util.HashMap;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  *
@@ -15,10 +18,11 @@ import java.util.Set;
 public class Index {
     
     HashMap<Integer, Dictionary> dict;
-    
-    
+    SortedSet<String> words;
+            
     public Index(){
         dict = new HashMap<>();
+        words = new TreeSet<>();
     }
     
     public void addTerm(String term, int doc){
@@ -30,6 +34,7 @@ public class Index {
             dict.replace(term.hashCode(), d);
             return;
         }
+        words.add(term);
         dict.put(term.hashCode(), new Dictionary(term, doc));
     }
     
@@ -56,6 +61,10 @@ public class Index {
     
     public Set<Integer> keySet(){
         return dict.keySet();
+    }
+    
+    public SortedSet<String> getSortedWords(){
+        return words;
     }
     
 }

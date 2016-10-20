@@ -45,6 +45,9 @@ public class Document {
         return documentPath;
     }
     
+    public int getOriginalDocId() {
+        return originalDocId;
+    }
     
     
 }

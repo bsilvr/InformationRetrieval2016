@@ -47,12 +47,14 @@ public class IRE {
             docProc.processDocument(file);
             file = corpus.getNextFile();
         }
+        docProc.finishReadingDocs();
         
         Document doc = docProc.getNextDocument();
+        String content = "";
         while(doc != null){
-            
+            content = docProc.getDocumentContent(doc);
             Tokenizer tokenizer = new Tokenizer(stopWordsList.toArray(new String[0]));
-            tokenizer.tokenize(doc);
+            tokenizer.tokenize(content, doc);
             
             Token token = tokenizer.getNextToken();
             while(token != null){
@@ -63,8 +65,10 @@ public class IRE {
             }
             
             doc = docProc.getNextDocument();
+            
         }
         indexer.writeIndex();
+        docProc.writeDocuments();
         System.err.println("DONE!");
     }
     

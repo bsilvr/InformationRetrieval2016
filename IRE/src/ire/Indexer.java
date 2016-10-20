@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  */
 public class Indexer {
     final String index_path = "index.txt";
-    final String doc_path = "doc_dict.txt";
+    
     
     private Index index;
     
@@ -40,8 +40,8 @@ public class Indexer {
         try {
             writer = new PrintWriter(fl, "UTF-8");
             
-            for(int i: index.keySet()){
-                Dictionary d = index.get(i);
+            for(String i: index.getSortedWords()){
+                Dictionary d = index.get(i.hashCode());
                 
                 writer.println(d.getTerm()+";"+d.getnDocs()+";"+d.getPostingList().toString());
             }
