@@ -44,7 +44,7 @@ public class IRE {
         String[] stopWordsArray = stopWordsList.toArray(new String[0]);
         
         // Listar ficheiros, e respetivas extenções, de um determinado diretorio
-        corpus.readDir("sample_corpus");
+        corpus.readDir("corpus-RI");
         
         // Dividir e guardar numa array list todos os documentos encontrados nos ficheiros
         CorpusFile file = corpus.getNextFile();
@@ -69,13 +69,11 @@ public class IRE {
         }
         
         
-        // 
+         
         Runtime runtime = Runtime.getRuntime();
 
         NumberFormat format = NumberFormat.getInstance();
 
-        StringBuilder sb = new StringBuilder();
-        long maxMemory = runtime.maxMemory();
         long allocatedMemory = runtime.totalMemory();
         long freeMemory = runtime.freeMemory();
 
@@ -87,8 +85,6 @@ public class IRE {
         
         format = NumberFormat.getInstance();
 
-        sb = new StringBuilder();
-        maxMemory = runtime.maxMemory();
         allocatedMemory = runtime.totalMemory();
         freeMemory = runtime.freeMemory();
 
