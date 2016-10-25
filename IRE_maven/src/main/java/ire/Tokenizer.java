@@ -44,7 +44,7 @@ public class Tokenizer {
         
     public String transform(String term){
         term = term.toLowerCase();
-        if(Arrays.asList(stopWordsList).contains(term)){
+        if(useArraysBinarySearch(stopWordsList, term)){
             return null;
         }
         
@@ -71,5 +71,14 @@ public class Tokenizer {
             return tokensIterator.next();
         }
         return null;
+    }
+    
+    // http://www.programcreek.com/2014/04/check-if-array-contains-a-value-java/
+    public static boolean useArraysBinarySearch(String[] arr, String targetValue) {	
+	int a =  Arrays.binarySearch(arr, targetValue);
+	if(a > 0)
+            return true;
+	else
+            return false;
     }
 }

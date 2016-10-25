@@ -6,6 +6,7 @@
 package ire;
 
 import ire.DocumentProcessors.ArffProcessor;
+import ire.workers.TI_Worker;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -25,11 +26,14 @@ public class IRE {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        String dir = "corpus-RI";
+        
         double startTime = System.currentTimeMillis();
         
         CorpusReader corpus = new CorpusReader();
         DocumentProcessor docProc = new DocumentProcessor();
-        Indexer indexer = new Indexer();
+        //Indexer indexer = new Indexer();
+        Index idx = new Index();
         
         // Guardar stopwords numa Array List
         File stopWords = new File("stopwords_en.txt");
@@ -44,7 +48,7 @@ public class IRE {
         String[] stopWordsArray = stopWordsList.toArray(new String[0]);
         
         // Listar ficheiros, e respetivas extenções, de um determinado diretorio
-        corpus.readDir("corpus-RI");
+        corpus.readDir(dir);
         
         // Dividir e guardar numa array list todos os documentos encontrados nos ficheiros
         CorpusFile file = corpus.getNextFile();
@@ -54,23 +58,25 @@ public class IRE {
         }
         docProc.finishReadingDocs();
         
-        // Tokenizar cada documento e indexar cada token 
-        Document doc = docProc.getNextDocument();
-        String content = "";
-        while(doc != null){
-            content = docProc.getDocumentContent(doc);
-            Tokenizer tokenizer = new Tokenizer(stopWordsArray);
-            String[] tokens =  tokenizer.tokenize(content, doc);
-            
-            indexer.indexToken(tokens, doc.getDocId());
-            
-            doc = docProc.getNextDocument();
-            
+        Runtime runtime = Runtime.getRuntime();
+        
+        int nthreads = runtime.availableProcessors() * 2;
+        
+        TI_Worker[] thread_pool = new TI_Worker[nthreads];
+        
+        for(int i = 0; i < nthreads; i++){
+            thread_pool[i] = new TI_Worker(docProc, idx, stopWordsArray);
+            thread_pool[i].start();
         }
         
+        for(int i = 0; i < nthreads; i++){
+            try {
+                thread_pool[i].join();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(IRE.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         
-         
-        Runtime runtime = Runtime.getRuntime();
 
         NumberFormat format = NumberFormat.getInstance();
 
@@ -80,12 +86,11 @@ public class IRE {
         
         System.out.println("Allocated memory before write index: " + format.format((allocatedMemory-freeMemory) / 1024)+"Mb");
         
+        
+        Indexer indexer = new Indexer(idx);
         indexer.writeIndex();
         docProc.writeDocuments();
-        
-        format = NumberFormat.getInstance();
-
-        allocatedMemory = runtime.totalMemory();
+               
         freeMemory = runtime.freeMemory();
 
         

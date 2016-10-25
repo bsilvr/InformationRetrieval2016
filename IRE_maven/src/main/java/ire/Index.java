@@ -24,7 +24,7 @@ public class Index {
         words = new TreeSet<>();
     }
     
-    public void addTerm(String term, int doc){
+    public synchronized void addTerm(String term, int doc){
         // adiciona um termo no indice em que apareceu no doc.
         // se ja existir adicionar a posting list.
         if(dict.containsKey(term.hashCode())){

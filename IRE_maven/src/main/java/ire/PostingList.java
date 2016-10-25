@@ -5,18 +5,19 @@
  */
 package ire;
 
-import java.util.ArrayList;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  *
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
-public class Posting {
+public class PostingList {
     
-    private ArrayList<Integer> docs;
+    private SortedSet<Integer> docs;
     
-    public Posting(){
-        this.docs = new ArrayList<>();
+    public PostingList(){
+        this.docs = new TreeSet<>();
     }
     
     public void addPosting(int doc){
@@ -35,8 +36,8 @@ public class Posting {
         docs.remove(doc);
     }
     
-    public ArrayList getAllPostings(){
-        return docs;
+    public Integer[] getAllPostings(){
+        return docs.toArray(new Integer[0]);
     }
     
     @Override

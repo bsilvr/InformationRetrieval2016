@@ -46,7 +46,7 @@ public class DocumentProcessor {
         return documents;
     }
     
-    public Document getNextDocument(){
+    public synchronized Document getNextDocument(){
         if(documentsIterator.hasNext()) {
             return documentsIterator.next();    
         }

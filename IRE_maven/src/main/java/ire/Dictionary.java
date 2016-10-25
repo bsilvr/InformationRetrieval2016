@@ -12,18 +12,18 @@ package ire;
 public class Dictionary {
     String term;
     int nDocs;
-    Posting postingList;
+    PostingList postingList;
     
     public Dictionary(String term){
         this.term = term;
         this.nDocs = 0;
-        this.postingList = new Posting();
+        this.postingList = new PostingList();
     }
     
     public Dictionary(String term, int doc){
         this.term = term;
         this.nDocs = 1;
-        this.postingList = new Posting();
+        this.postingList = new PostingList();
         this.postingList.addPosting(doc);
     }
     
@@ -44,7 +44,7 @@ public class Dictionary {
         return this.term;
     }
     
-    public Posting getPostingList(){
+    public PostingList getPostingList(){
         return this.postingList;
     }
     
