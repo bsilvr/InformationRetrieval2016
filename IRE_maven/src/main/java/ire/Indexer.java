@@ -46,7 +46,7 @@ public class Indexer {
             for(String i: index.getSortedWords()){
                 Dictionary d = index.get(i.hashCode());
                 
-                writer.println(d.getTerm()+";"+d.getnDocs()+";"+d.getPostingList().toString());
+                writer.println(d.getTerm()+"-"+d.getnDocs()+"-"+d.getPostingList().toString());
             }
             
             writer.close();

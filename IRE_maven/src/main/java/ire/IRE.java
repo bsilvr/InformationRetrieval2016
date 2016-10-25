@@ -6,12 +6,12 @@
 package ire;
 
 import ire.DocumentProcessors.ArffProcessor;
+import ire.workers.DP_Worker;
 import ire.workers.TI_Worker;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,6 +29,10 @@ public class IRE {
         String dir = "corpus-RI";
         
         double startTime = System.currentTimeMillis();
+        
+        Runtime runtime = Runtime.getRuntime();
+        
+        int nthreads = runtime.availableProcessors() * 2;
         
         CorpusReader corpus = new CorpusReader();
         DocumentProcessor docProc = new DocumentProcessor();
@@ -51,16 +55,29 @@ public class IRE {
         corpus.readDir(dir);
         
         // Dividir e guardar numa array list todos os documentos encontrados nos ficheiros
-        CorpusFile file = corpus.getNextFile();
-        while(file != null){
-            docProc.processDocument(file);
-            file = corpus.getNextFile();
+//        CorpusFile file = corpus.getNextFile();
+//        while(file != null){
+//            docProc.processDocument(file);
+//            file = corpus.getNextFile();
+//        }
+
+        DP_Worker[] thread_pool_dp = new DP_Worker[nthreads];
+        
+        for(int i = 0; i < nthreads; i++){
+            thread_pool_dp[i] = new DP_Worker(corpus, docProc);
+            thread_pool_dp[i].start();
+        }
+        
+        for(int i = 0; i < nthreads; i++){
+            try {
+                thread_pool_dp[i].join();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(IRE.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         docProc.finishReadingDocs();
         
-        Runtime runtime = Runtime.getRuntime();
         
-        int nthreads = runtime.availableProcessors() * 2;
         
         TI_Worker[] thread_pool = new TI_Worker[nthreads];
         
@@ -78,24 +95,24 @@ public class IRE {
         }
         
 
-        NumberFormat format = NumberFormat.getInstance();
+        //NumberFormat format = NumberFormat.getInstance();
 
-        long allocatedMemory = runtime.totalMemory();
-        long freeMemory = runtime.freeMemory();
+        //long allocatedMemory = runtime.totalMemory();
+        //long freeMemory = runtime.freeMemory();
 
         
-        System.out.println("Allocated memory before write index: " + format.format((allocatedMemory-freeMemory) / 1024)+"Mb");
+        //System.out.println("Allocated memory before write index: " + format.format((allocatedMemory-freeMemory) / 1024)+"Mb");
         
         
         Indexer indexer = new Indexer(idx);
         indexer.writeIndex();
         docProc.writeDocuments();
                
-        freeMemory = runtime.freeMemory();
+        //freeMemory = runtime.freeMemory();
 
         
-        System.out.println("Allocated memory after write index: " + format.format((allocatedMemory-freeMemory) / 1024)+"Mb");
-        double endTime   = System.currentTimeMillis();
+        //System.out.println("Allocated memory after write index: " + format.format((allocatedMemory-freeMemory) / 1024)+"Mb");
+        double endTime = System.currentTimeMillis();
         double totalTime = (endTime - startTime)/1000;
         System.out.println("Runtime: "+totalTime+" seconds.");
     }

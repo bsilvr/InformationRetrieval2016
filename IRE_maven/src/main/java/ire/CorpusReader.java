@@ -60,7 +60,7 @@ public class CorpusReader {
         return files;
     }
     
-    public CorpusFile getNextFile(){
+    public synchronized CorpusFile getNextFile(){
         if(corpusIterator.hasNext()) {
             return corpusIterator.next();
         }

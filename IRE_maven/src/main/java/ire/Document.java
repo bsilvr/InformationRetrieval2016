@@ -21,12 +21,11 @@ public class Document {
     String documentPath;
     
     public Document(String filePath, int docStartLine, int originalDocId){
-        this.docId = Document.id;
+        this.docId = getID();
         this.filePath = filePath;
         this.docStartLine = docStartLine;
         this.documentPath = tmpPath + "doc_" + id;
         this.originalDocId = originalDocId;
-        Document.id++;
     }
 
     public String getFilePath() {
@@ -48,6 +47,18 @@ public class Document {
     public int getOriginalDocId() {
         return originalDocId;
     }
+
+    int compareTo(Document b) {
+        if(docId == b.getDocId()){
+            return 0;
+        }
+        else if(docId < b.getDocId()){
+            return -1;
+        }
+        return 1;
+    }
     
-    
+    private static synchronized int getID(){
+        return Document.id++;
+    }
 }

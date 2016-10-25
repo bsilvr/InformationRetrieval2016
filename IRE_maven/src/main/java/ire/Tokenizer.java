@@ -7,7 +7,7 @@ package ire;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
+import java.util.regex.Pattern;
 import org.tartarus.snowball.ext.englishStemmer;
 
 /**
@@ -15,9 +15,8 @@ import org.tartarus.snowball.ext.englishStemmer;
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class Tokenizer {
-    
+    private Pattern pattern = Pattern.compile("\\W");
     private ArrayList<String> tokens = new ArrayList<>();
-    private Iterator<Token> tokensIterator;
     String [] stopWordsList;
     englishStemmer stemmer = new englishStemmer();
     
@@ -27,8 +26,8 @@ public class Tokenizer {
     
     public String[] tokenize(String content, Document doc){
         
-
-        content = content.replace("-", " ");
+        content = content.replaceAll("[-()]", " ");
+        //content = content.replace("-", " ");
         String [] words = content.split("\\s+");
         for(String w : words){
             String word = transform(w);
@@ -48,9 +47,17 @@ public class Tokenizer {
             return null;
         }
         
-        term = term.replaceAll("\\W", "");
+        //term = term.replaceAll("\\W", "");
+        term = pattern.matcher(term).replaceAll("");
         if(term.length()<2){
             return null;
+        }
+        
+        try {
+            int foo = Integer.parseInt(term);
+            return Integer.toString(foo);
+        } catch (Exception e) {
+            
         }
 
         // Stemming
@@ -66,12 +73,12 @@ public class Tokenizer {
         return tokens;
     }
     
-    public Token getNextToken(){
-        if(tokensIterator.hasNext()) {
-            return tokensIterator.next();
-        }
-        return null;
-    }
+//    public Token getNextToken(){
+//        if(tokensIterator.hasNext()) {
+//            return tokensIterator.next();
+//        }
+//        return null;
+//    }
     
     // http://www.programcreek.com/2014/04/check-if-array-contains-a-value-java/
     public static boolean useArraysBinarySearch(String[] arr, String targetValue) {	

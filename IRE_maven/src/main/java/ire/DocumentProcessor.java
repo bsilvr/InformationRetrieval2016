@@ -11,7 +11,8 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,36 +22,41 @@ import java.util.logging.Logger;
  */
 public class DocumentProcessor {
     
-    private ArrayList<Document> documents;
-    private Iterator<Document> documentsIterator;
+    private SortedSet<Document> documents;
+    private Document[] documentsArray;
+    private int currentDoc = 0;
     
     final String doc_path = "doc_dict.txt";    
     
     public DocumentProcessor(){
-        documents = new ArrayList<>();
+        documents = new TreeSet<>((Document a, Document b) -> a.compareTo(b));
         // criar pasta para guardar os documentos em formato unico
     }
     
     public void processDocument(CorpusFile cfile){
         // Ver a extensao e enviar o path para a função adequada.
         if(cfile.getExtension().equals("arff")){
-            documents.addAll(ArffProcessor.identify(cfile));
+            ArrayList<Document> tmp = ArffProcessor.identify(cfile);
+            synchronized(documents){
+                documents.addAll(tmp);
+            }
         }
     }
     
     public void finishReadingDocs(){
-        documentsIterator = documents.iterator();
+        documentsArray = documents.toArray(new Document[0]);
+        documents = null;
     }
     
-    public ArrayList<Document> getDocuments() {
-        return documents;
+    public Document[] getDocuments() {
+        return documents.toArray(new Document[0]);
     }
     
     public synchronized Document getNextDocument(){
-        if(documentsIterator.hasNext()) {
-            return documentsIterator.next();    
+        if(currentDoc == documentsArray.length) {
+            return null;
         }
-        return null;
+        return documentsArray[currentDoc++];
     }
     
     public String getDocumentContent(Document doc){
@@ -66,9 +72,12 @@ public class DocumentProcessor {
         try {
             writer = new PrintWriter(fl, "UTF-8");
             
-            for(Document i: documents){
-                
-                writer.println(i.getDocId() +";"+ i.getFilePath() +";"+ i.getOriginalDocId());
+            for(int i = 0; i < documentsArray.length; i++){
+                if(documentsArray[i] == null){
+                    System.err.println("Null Document" + i);
+                    continue;
+                }
+                writer.println(documentsArray[i].getDocId() +";"+ documentsArray[i].getFilePath() +";"+ documentsArray[i].getOriginalDocId());
             }
             
             writer.close();
