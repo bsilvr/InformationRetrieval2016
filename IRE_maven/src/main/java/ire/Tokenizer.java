@@ -16,8 +16,7 @@ import org.tartarus.snowball.ext.englishStemmer;
  */
 public class Tokenizer {
     
-    static String special = "[!.\'#$%&()*+,-./:;<>=?@\\^_´`}{~|]";
-    private ArrayList<Token> tokens = new ArrayList<>();
+    private ArrayList<String> tokens = new ArrayList<>();
     private Iterator<Token> tokensIterator;
     String [] stopWordsList;
     englishStemmer stemmer = new englishStemmer();
@@ -26,7 +25,7 @@ public class Tokenizer {
         this.stopWordsList = stopWordsList;
     }
     
-    public void tokenize(String content, Document doc){
+    public String[] tokenize(String content, Document doc){
         
 
         content = content.replace("-", " ");
@@ -34,12 +33,13 @@ public class Tokenizer {
         for(String w : words){
             String word = transform(w);
             if(word != null){
-                Token tk = new Token(word, doc);
-                tokens.add(tk);
+                //Token tk = new Token(word, doc);
+                tokens.add(word);
             } 
         }
-                
-        tokensIterator = tokens.iterator();
+        return tokens.toArray(new String[0]);     
+        
+        //tokensIterator = tokens.iterator();
     }
         
     public String transform(String term){
@@ -62,7 +62,7 @@ public class Tokenizer {
         return term;
     }
     
-    public ArrayList<Token> getTokens() {
+    public ArrayList<String> getTokens() {
         return tokens;
     }
     

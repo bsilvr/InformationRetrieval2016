@@ -30,8 +30,11 @@ public class Indexer {
         index = idx;
     }
     
-    public void indexToken(Token token){
-        index.addTerm(token.getTerm(), token.getDocument().getDocId());
+    public void indexToken(String[] tokens, int docId){
+        for (String token : tokens){
+            index.addTerm(token, docId);
+        }
+        
     }
     
     public void writeIndex(){

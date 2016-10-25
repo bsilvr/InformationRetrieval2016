@@ -60,15 +60,9 @@ public class IRE {
         while(doc != null){
             content = docProc.getDocumentContent(doc);
             Tokenizer tokenizer = new Tokenizer(stopWordsArray);
-            tokenizer.tokenize(content, doc);
+            String[] tokens =  tokenizer.tokenize(content, doc);
             
-            Token token = tokenizer.getNextToken();
-            while(token != null){
-                //System.out.println(token.getTerm());
-                indexer.indexToken(token);
-                
-                token = tokenizer.getNextToken();
-            }
+            indexer.indexToken(tokens, doc.getDocId());
             
             doc = docProc.getNextDocument();
             
