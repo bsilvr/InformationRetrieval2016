@@ -8,7 +8,6 @@ package ire;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -20,15 +19,19 @@ import org.apache.commons.io.filefilter.TrueFileFilter;
 public class CorpusReader {
     static String [] ignoreExtensions = {".pdf", ".docx", ".txt"};
     
+    private int currentFile;
+    private boolean finishedReadDir;
     private ArrayList<CorpusFile> files;
     
-    private Iterator<CorpusFile> corpusIterator;
+    private CorpusFile[] corpusIterator;
     
     public CorpusReader(){
+        currentFile = 0;
+        finishedReadDir = false;
         files = new ArrayList<>();
     }
     
-    public void readDir(String path){
+    public synchronized void readDir(String path){
         // Ver o formato e guardar path e extension na array list recursivamente dentro de pastas
         File dir = new File(path);
         Collection<File> f = FileUtils.listFiles(dir,new IOFileFilter(){
@@ -53,7 +56,9 @@ public class CorpusReader {
             }
         }
                 ,TrueFileFilter.INSTANCE);
-        corpusIterator = files.iterator();
+        corpusIterator = files.toArray(new CorpusFile[0]);
+        finishedReadDir = true;
+        notifyAll();
     }
 
     public ArrayList<CorpusFile> getFiles() {
@@ -61,9 +66,15 @@ public class CorpusReader {
     }
     
     public synchronized CorpusFile getNextFile(){
-        if(corpusIterator.hasNext()) {
-            return corpusIterator.next();
+        if(!finishedReadDir){
+            try {
+                wait();
+            } catch (InterruptedException ex) {
+            }
         }
-        return null;
+        if(currentFile == corpusIterator.length) {
+            return null;
+        }
+        return corpusIterator[currentFile++];
     }
 }

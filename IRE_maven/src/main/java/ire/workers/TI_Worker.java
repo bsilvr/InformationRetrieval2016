@@ -30,16 +30,21 @@ public class TI_Worker extends Thread{
     public void run() {
         Document doc = docProc.getNextDocument();
         String content = "";
+        Tokenizer tokenizer;
+        String[] tokens;
         while(doc != null){
             content = docProc.getDocumentContent(doc);
-            Tokenizer tokenizer = new Tokenizer(stopWordsArray);
-            String[] tokens =  tokenizer.tokenize(content, doc);
+            tokenizer = new Tokenizer(stopWordsArray);
+            tokens =  tokenizer.tokenize(content, doc);
             
             indexer.indexToken(tokens, doc.getDocId());
             
-            doc = docProc.getNextDocument();
-            
+            doc = docProc.getNextDocument();   
         }
+        doc = null;
+        content = null;
+        tokenizer = null;
+        tokens = null;
     }
     
 }

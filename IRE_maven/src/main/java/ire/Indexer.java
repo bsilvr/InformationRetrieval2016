@@ -31,10 +31,9 @@ public class Indexer {
     }
     
     public void indexToken(String[] tokens, int docId){
-        for (String token : tokens){
-            index.addTerm(token, docId);
+        for (int i = 0; i < tokens.length; i++){
+            index.addTerm(tokens[i], docId);
         }
-        
     }
     
     public void writeIndex(){

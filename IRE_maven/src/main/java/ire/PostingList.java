@@ -5,7 +5,6 @@
  */
 package ire;
 
-import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -37,24 +36,14 @@ public class PostingList {
         docs.remove(doc);
     }
     
-    public int[] getAllPostings(){
-        int[] ret = new int[docs.size()];
-        Iterator<Integer> iterator = docs.iterator();
-        for (int i = 0; i < ret.length; i++)
-        {
-            ret[i] = iterator.next();
-        }
-        return ret;
-    }
-    
     @Override
     public String toString(){
-        int[] postings = getAllPostings();
-        String s = "";
-        for (int i = 0; i < postings.length; i++){
-            s += postings[i] + ",";
+        Integer[] postings = docs.toArray(new Integer[0]);
+        StringBuilder s = new StringBuilder();
+        for(int i = 0; i < postings.length; i++){
+            s.append(postings[i]);
+            s.append(",");
         }
-        s = s.substring(0, s.length()-1);
-        return s;
+        return s.substring(0, s.length()-1);
     }
 }

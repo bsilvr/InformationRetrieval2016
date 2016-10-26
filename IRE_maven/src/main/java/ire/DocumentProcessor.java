@@ -11,8 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,30 +21,29 @@ import java.util.logging.Logger;
  */
 public class DocumentProcessor {
     
-    private SortedSet<Document> documents;
-    private Document[] documentsArray;
-    private int currentDoc = 0;
-    
+    private ArrayList<Document> documents;
+    private int currentDoc;
+    private int ndocs;
+    private int docsToProcess;
     final String doc_path = "doc_dict.txt";    
     
     public DocumentProcessor(){
-        documents = new TreeSet<>((Document a, Document b) -> a.compareTo(b));
-        // criar pasta para guardar os documentos em formato unico
+        documents = new ArrayList<>();
+        currentDoc = 0;
+        ndocs = 0;
+        docsToProcess = 0;
     }
     
-    public void processDocument(CorpusFile cfile){
+    public synchronized void processDocument(CorpusFile cfile){
         // Ver a extensao e enviar o path para a função adequada.
         if(cfile.getExtension().equals("arff")){
             ArrayList<Document> tmp = ArffProcessor.identify(cfile);
             synchronized(documents){
                 documents.addAll(tmp);
+                docsToProcess += tmp.size();
+                notifyAll();
             }
         }
-    }
-    
-    public void finishReadingDocs(){
-        documentsArray = documents.toArray(new Document[0]);
-        documents = null;
     }
     
     public Document[] getDocuments() {
@@ -53,12 +51,24 @@ public class DocumentProcessor {
     }
     
     public synchronized Document getNextDocument(){
-        if(currentDoc == documentsArray.length) {
+        // the end
+        if(currentDoc == ndocs && ndocs != 0) {
             return null;
         }
-        return documentsArray[currentDoc++];
+        if(currentDoc >= docsToProcess){
+            try {
+                wait();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(DocumentProcessor.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        // the end
+        if(currentDoc == ndocs && ndocs != 0) {
+            return null;
+        }
+        return documents.get(currentDoc++);
     }
-    
+       
     public String getDocumentContent(Document doc){
         if (doc.getFilePath().endsWith(".arff")){
             return ArffProcessor.process(doc);
@@ -67,6 +77,8 @@ public class DocumentProcessor {
     }
     
     public void writeDocuments(){
+        Document[] documentsArray = documents.toArray(new Document[0]);
+        Arrays.sort(documentsArray, (Document a, Document b) -> a.compareTo(b));
         File fl = new File(doc_path);
         PrintWriter writer;
         try {
@@ -84,6 +96,11 @@ public class DocumentProcessor {
         } catch (FileNotFoundException | UnsupportedEncodingException ex) {
             Logger.getLogger(Indexer.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public synchronized void finishedProcess() {
+        ndocs = docsToProcess;
+        notifyAll();
     }
     
 }

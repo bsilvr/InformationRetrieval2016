@@ -26,19 +26,35 @@ public class IRE {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        // configurações
         String dir = "corpus-RI";
+        int nthreads_dp = 10;
+        int nthreads_ti = 10;
         
+        ////////////////////////////////////////////////
         double startTime = System.currentTimeMillis();
-        
-        Runtime runtime = Runtime.getRuntime();
-        
-        int nthreads = runtime.availableProcessors() * 2;
+        double endTime;
+        double totalTime;
         
         CorpusReader corpus = new CorpusReader();
         DocumentProcessor docProc = new DocumentProcessor();
-        //Indexer indexer = new Indexer();
         Index idx = new Index();
         
+        //Launching threads
+        DP_Worker[] thread_pool_dp = new DP_Worker[nthreads_dp];
+        
+        for(int i = 0; i < nthreads_dp; i++){
+            thread_pool_dp[i] = new DP_Worker(corpus, docProc);
+            thread_pool_dp[i].start();
+        }
+
+        // Listar ficheiros, e respetivas extenções, de um determinado diretorio
+        corpus.readDir(dir);
+        
+        endTime = System.currentTimeMillis();
+        totalTime = (endTime - startTime)/1000;
+        System.out.println("Read Dir: "+totalTime+" seconds.");
+
         // Guardar stopwords numa Array List
         File stopWords = new File("stopwords_en.txt");
         ArrayList<String> stopWordsList = new ArrayList<>();
@@ -51,42 +67,26 @@ public class IRE {
         }
         String[] stopWordsArray = stopWordsList.toArray(new String[0]);
         
-        // Listar ficheiros, e respetivas extenções, de um determinado diretorio
-        corpus.readDir(dir);
-        
-        // Dividir e guardar numa array list todos os documentos encontrados nos ficheiros
-//        CorpusFile file = corpus.getNextFile();
-//        while(file != null){
-//            docProc.processDocument(file);
-//            file = corpus.getNextFile();
-//        }
-
-        DP_Worker[] thread_pool_dp = new DP_Worker[nthreads];
-        
-        for(int i = 0; i < nthreads; i++){
-            thread_pool_dp[i] = new DP_Worker(corpus, docProc);
-            thread_pool_dp[i].start();
+        TI_Worker[] thread_pool = new TI_Worker[nthreads_ti];
+        for(int i = 0; i < nthreads_ti; i++){
+            thread_pool[i] = new TI_Worker(docProc, idx, stopWordsArray);
+            thread_pool[i].start();
         }
         
-        for(int i = 0; i < nthreads; i++){
+        for(int i = 0; i < nthreads_dp; i++){
             try {
                 thread_pool_dp[i].join();
             } catch (InterruptedException ex) {
                 Logger.getLogger(IRE.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        docProc.finishReadingDocs();
+        docProc.finishedProcess();
         
+        endTime = System.currentTimeMillis();
+        totalTime = (endTime - startTime)/1000;
+        System.out.println("Processed Documents: "+totalTime+" seconds.");
         
-        
-        TI_Worker[] thread_pool = new TI_Worker[nthreads];
-        
-        for(int i = 0; i < nthreads; i++){
-            thread_pool[i] = new TI_Worker(docProc, idx, stopWordsArray);
-            thread_pool[i].start();
-        }
-        
-        for(int i = 0; i < nthreads; i++){
+        for(int i = 0; i < nthreads_ti; i++){
             try {
                 thread_pool[i].join();
             } catch (InterruptedException ex) {
@@ -94,26 +94,16 @@ public class IRE {
             }
         }
         
-
-        //NumberFormat format = NumberFormat.getInstance();
-
-        //long allocatedMemory = runtime.totalMemory();
-        //long freeMemory = runtime.freeMemory();
-
-        
-        //System.out.println("Allocated memory before write index: " + format.format((allocatedMemory-freeMemory) / 1024)+"Mb");
-        
+        endTime = System.currentTimeMillis();
+        totalTime = (endTime - startTime)/1000;
+        System.out.println("Before write: "+totalTime+" seconds.");
         
         Indexer indexer = new Indexer(idx);
         indexer.writeIndex();
         docProc.writeDocuments();
                
-        //freeMemory = runtime.freeMemory();
-
-        
-        //System.out.println("Allocated memory after write index: " + format.format((allocatedMemory-freeMemory) / 1024)+"Mb");
-        double endTime = System.currentTimeMillis();
-        double totalTime = (endTime - startTime)/1000;
+        endTime = System.currentTimeMillis();
+        totalTime = (endTime - startTime)/1000;
         System.out.println("Runtime: "+totalTime+" seconds.");
     }
     

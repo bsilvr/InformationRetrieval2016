@@ -29,16 +29,15 @@ public class Tokenizer {
         content = content.replaceAll("[-()]", " ");
         //content = content.replace("-", " ");
         String [] words = content.split("\\s+");
-        for(String w : words){
-            String word = transform(w);
+        for(int i = 0; i < words.length; i++){
+            String word = transform(words[i]);
             if(word != null){
                 //Token tk = new Token(word, doc);
                 tokens.add(word);
             } 
         }
-        return tokens.toArray(new String[0]);     
         
-        //tokensIterator = tokens.iterator();
+        return tokens.toArray(new String[0]);  
     }
         
     public String transform(String term){
@@ -51,13 +50,6 @@ public class Tokenizer {
         term = pattern.matcher(term).replaceAll("");
         if(term.length()<2){
             return null;
-        }
-        
-        try {
-            int foo = Integer.parseInt(term);
-            return Integer.toString(foo);
-        } catch (Exception e) {
-            
         }
 
         // Stemming
@@ -72,13 +64,6 @@ public class Tokenizer {
     public ArrayList<String> getTokens() {
         return tokens;
     }
-    
-//    public Token getNextToken(){
-//        if(tokensIterator.hasNext()) {
-//            return tokensIterator.next();
-//        }
-//        return null;
-//    }
     
     // http://www.programcreek.com/2014/04/check-if-array-contains-a-value-java/
     public static boolean useArraysBinarySearch(String[] arr, String targetValue) {	
