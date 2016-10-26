@@ -53,7 +53,7 @@ public class IRE {
         
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime)/1000;
-        System.out.println("Read Dir: "+totalTime+" seconds.");
+        System.out.println("Finished Reading Directory: "+totalTime+" seconds.");
 
         // Guardar stopwords numa Array List
         File stopWords = new File("stopwords_en.txt");
@@ -84,7 +84,7 @@ public class IRE {
         
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime)/1000;
-        System.out.println("Processed Documents: "+totalTime+" seconds.");
+        System.out.println("Finished Processed Documents: "+totalTime+" seconds.");
         
         for(int i = 0; i < nthreads_ti; i++){
             try {
@@ -96,7 +96,7 @@ public class IRE {
         
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime)/1000;
-        System.out.println("Before write: "+totalTime+" seconds.");
+        System.out.println("Finished Indexing: "+totalTime+" seconds.");
         
         Indexer indexer = new Indexer(idx);
         indexer.writeIndex();
@@ -104,7 +104,7 @@ public class IRE {
                
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime)/1000;
-        System.out.println("Runtime: "+totalTime+" seconds.");
+        System.out.println("Finished writing index to file: "+totalTime+" seconds.");
     }
     
 }

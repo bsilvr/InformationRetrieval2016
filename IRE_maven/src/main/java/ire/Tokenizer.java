@@ -47,13 +47,14 @@ public class Tokenizer {
         
     public String transform(String term){
         term = term.toLowerCase();
-        if(useArraysBinarySearch(stopWordsList, term)){
-            return null;
-        }
         
         //term = term.replaceAll("\\W", "");
         term = pattern.matcher(term).replaceAll("");
         if(term.length()<2){
+            return null;
+        }
+        
+        if(useArraysBinarySearch(stopWordsList, term)){
             return null;
         }
 
