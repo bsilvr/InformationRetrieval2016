@@ -11,10 +11,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang3.StringUtils;
 /**
  *
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
@@ -33,9 +33,8 @@ public class ArffProcessor {
                 // process the line.
                 idx++;
                 if(idx == nLine){
-                    String[] parts = line.split("\"");
-                    parts[1] = parts[1].replace("<e>", "");
-                    parts[1] = parts[1].replace("</e>", "");
+                    String[] parts = StringUtils.split(line, "\"");
+                    parts[1] = parts[1].replaceAll("<.e>", "");
                     return parts[1];
                 }
                 
