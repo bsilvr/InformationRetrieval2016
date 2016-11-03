@@ -18,13 +18,11 @@ public class Document {
     int originalDocId;
     
     int docId;
-    String documentPath;
     
     public Document(String filePath, int docStartLine, int originalDocId){
         this.docId = getID();
         this.filePath = filePath;
         this.docStartLine = docStartLine;
-        this.documentPath = tmpPath + "doc_" + id;
         this.originalDocId = originalDocId;
     }
 
@@ -40,10 +38,6 @@ public class Document {
         return docId;
     }
 
-    public String getDocumentPath() {
-        return documentPath;
-    }
-    
     public int getOriginalDocId() {
         return originalDocId;
     }
