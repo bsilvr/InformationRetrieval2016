@@ -11,9 +11,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -47,24 +51,14 @@ public class CsvProcessor {
     public static ArrayList<Document> identify(CorpusFile file){
         ArrayList<Document> documents = new ArrayList<>();
         File cf = new File(file.getPath());
-        
-        try(BufferedReader br = new BufferedReader(new FileReader(cf))) {
-            int nLine = 0;
-            for(String line; (line = br.readLine()) != null; ) {
-                // process the line.
-                nLine++;
-                
-                String[] parts = line.split(",");
-                for(int i = 0;i<parts.length; i++){
-                    System.out.println(parts[i]);
-                }
-                
-                //Document doc = new Document(file.getPath(), nLine, );
-                //documents.add(doc);
+        Charset utf8charset = Charset.forName("UTF-8");
+        try {
+            CSVParser parser = CSVParser.parse(cf, utf8charset, CSVFormat.DEFAULT);
+            for (CSVRecord csvRecord : parser) {
+               
             }
-            // line is not visible here.
         } catch (IOException ex) {
-            Logger.getLogger(ArffProcessor.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CsvProcessor.class.getName()).log(Level.SEVERE, null, ex);
         }
         return documents;
     }

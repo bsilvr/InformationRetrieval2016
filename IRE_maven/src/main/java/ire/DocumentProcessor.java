@@ -6,6 +6,7 @@
 package ire;
 
 import ire.DocumentProcessors.ArffProcessor;
+import ire.DocumentProcessors.CsvProcessor;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -21,7 +22,7 @@ import java.util.logging.Logger;
  */
 public class DocumentProcessor {
     
-    private ArrayList<Document> documents;
+    private final ArrayList<Document> documents;
     private int currentDoc;
     private int ndocs;
     private int docsToProcess;
@@ -38,6 +39,14 @@ public class DocumentProcessor {
         // Ver a extensao e enviar o path para a função adequada.
         if(cfile.getExtension().equals("arff")){
             ArrayList<Document> tmp = ArffProcessor.identify(cfile);
+            synchronized(documents){
+                documents.addAll(tmp);
+                docsToProcess += tmp.size();
+                notifyAll();
+            }
+        }
+        else if(cfile.getExtension().equals("csv")){
+            ArrayList<Document> tmp = CsvProcessor.identify(cfile);
             synchronized(documents){
                 documents.addAll(tmp);
                 docsToProcess += tmp.size();
