@@ -38,12 +38,15 @@ public class CsvProcessor {
             for (CSVRecord csvRecord : parser) {
                 idx++;
                 
+                
                 if(idx==nLine){
                     String body = csvRecord.get(5);
                     try{
-                        return body + csvRecord.get(6);
+                        
+                        return parseTags(body + csvRecord.get(6));
                         
                     }catch(ArrayIndexOutOfBoundsException e) {
+                        
                         return body;
                     }
                     
