@@ -27,39 +27,55 @@ import org.apache.commons.lang3.StringUtils;
 public class CsvProcessor {
     public static String process(Document doc){
         
-        File cf = new File(doc.getFilePath());
-        
         int nLine= doc.getDocStartLine();
+        File cf = new File(doc.getFilePath());
+        Charset utf8charset = Charset.forName("UTF-8");
+        CSVParser parser;
+        
         int idx = 0;
-        try(BufferedReader br = new BufferedReader(new FileReader(cf))) {
-            for(String line; (line = br.readLine()) != null; ) {
-                // process the line.
+        try {
+            parser = CSVParser.parse(cf, utf8charset, CSVFormat.DEFAULT);
+            for (CSVRecord csvRecord : parser) {
                 idx++;
-                if(idx == nLine){
-                    String[] parts = StringUtils.split(line, "\"");
-                    parts[1] = parts[1].replaceAll("<.e>", "");
-                    return parts[1];
+                
+                if(idx==nLine){
+                    String body = csvRecord.get(5);
+                    try{
+                        return body + csvRecord.get(6);
+                        
+                    }catch(ArrayIndexOutOfBoundsException e) {
+                        return body;
+                    }
+                    
                 }
                 
-            }
-            // line is not visible here.
-        } catch (IOException ex) {
-            Logger.getLogger(ArffProcessor.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
-    }
-    public static ArrayList<Document> identify(CorpusFile file){
-        ArrayList<Document> documents = new ArrayList<>();
-        File cf = new File(file.getPath());
-        Charset utf8charset = Charset.forName("UTF-8");
-        try {
-            CSVParser parser = CSVParser.parse(cf, utf8charset, CSVFormat.DEFAULT);
-            for (CSVRecord csvRecord : parser) {
-               
             }
         } catch (IOException ex) {
             Logger.getLogger(CsvProcessor.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return null;
+    }
+    public static ArrayList<Document> identify(CorpusFile file){
+        
+        int nLine = 0;
+        ArrayList<Document> documents = new ArrayList<>();
+        File cf = new File(file.getPath());
+        Charset utf8charset = Charset.forName("UTF-8");
+        CSVParser parser;
+        try {
+           
+            parser = CSVParser.parse(cf, utf8charset, CSVFormat.DEFAULT);
+            for (CSVRecord csvRecord : parser) {
+                if(nLine == 0){ nLine++; continue; }
+                nLine++;
+                
+                Document doc = new Document(file.getPath(), nLine, Integer.parseInt(csvRecord.get(0)));
+                documents.add(doc);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(CsvProcessor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         return documents;
     }
 }

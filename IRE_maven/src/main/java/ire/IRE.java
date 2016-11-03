@@ -6,6 +6,8 @@
 package ire;
 
 import ire.workers.DP_Worker;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -41,6 +43,14 @@ public class IRE {
 
         // Listar ficheiros, e respetivas extenções, de um determinado diretorio
         corpus.readDir(dir);
+        
+        for(int i = 0; i < nthreads_dp; i++){
+            try {
+                thread_pool_dp[i].join();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(IRE.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime)/1000;
