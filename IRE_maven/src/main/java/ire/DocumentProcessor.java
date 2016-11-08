@@ -82,6 +82,10 @@ public class DocumentProcessor {
         if (doc.getFilePath().endsWith(".arff")){
             return ArffProcessor.process(doc);
         } 
+        else if (doc.getFilePath().endsWith(".csv")){
+            return CsvProcessor.process(doc);
+        } 
+        
         return null;
     }
     

@@ -15,6 +15,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -25,6 +26,9 @@ import org.apache.commons.lang3.StringUtils;
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class CsvProcessor {
+    
+    private static final Pattern TAG_REGEX = Pattern.compile("<code>(.+?)</code>");
+    
     public static String process(Document doc){
         
         int nLine= doc.getDocStartLine();
@@ -47,7 +51,7 @@ public class CsvProcessor {
                         
                     }catch(ArrayIndexOutOfBoundsException e) {
                         
-                        return body;
+                        return parseTags(body);
                     }
                     
                 }
@@ -80,5 +84,13 @@ public class CsvProcessor {
         }
         
         return documents;
+    }
+
+    private static String parseTags(String string) {
+        string = string.replaceAll("(?s)<code>.*?</code>", "");
+        string = string.replaceAll("(?s)<CODE>.*?</CODE>", "");
+        string = string.replaceAll("<(.|\n)*?>", "");
+        System.out.println(string);
+        return string;
     }
 }

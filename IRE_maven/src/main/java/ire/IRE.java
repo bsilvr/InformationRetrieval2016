@@ -5,7 +5,14 @@
  */
 package ire;
 
+import ire.DocumentProcessors.ArffProcessor;
 import ire.workers.DP_Worker;
+import ire.workers.TI_Worker;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,7 +28,7 @@ public class IRE {
     public static void main(String[] args) {
         // configurações
         String dir = "stacksample";
-        int nthreads_dp = 10;
+        int nthreads_dp = 2;
         int nthreads_ti = 10;
         
         ////////////////////////////////////////////////
@@ -55,7 +62,7 @@ public class IRE {
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime)/1000;
         System.out.println("Finished Reading Directory: "+totalTime+" seconds.");
-/*
+
         // Guardar stopwords numa Array List
         File stopWords = new File("stopwords_en.txt");
         ArrayList<String> stopWordsList = new ArrayList<>();
@@ -105,7 +112,7 @@ public class IRE {
                
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime)/1000;
-        System.out.println("Finished writing index to file: "+totalTime+" seconds.");*/
+        System.out.println("Finished writing index to file: "+totalTime+" seconds.");
     }
     
 }
