@@ -14,18 +14,25 @@ import java.util.TreeSet;
  */
 public class PostingList {
     
-    private SortedSet<Integer> docs;
+    private SortedSet<Post> docs;
     
     public PostingList(){
         this.docs = new TreeSet<>();
     }
     
     public void addPosting(int doc){
-        docs.add(doc);
+        Post p = new Post(doc);
+        docs.add(p);
+    }
+    
+    public void addPostWeight(int doc, double weight){
+        Post p = new Post(doc, weight);
+        docs.add(p);
     }
     
     public boolean contains(int doc){
-        return docs.contains(doc);
+        Post p = new Post(doc);
+        return docs.contains(p);
     }
     
     public int postingListSize(){
@@ -33,15 +40,16 @@ public class PostingList {
     }
     
     public void removePosting(int doc){
-        docs.remove(doc);
+        Post p = new Post(doc);
+        docs.remove(p);
     }
     
     @Override
     public String toString(){
-        Integer[] postings = docs.toArray(new Integer[0]);
+        Post[] postings = docs.toArray(new Post[0]);
         StringBuilder s = new StringBuilder();
         for(int i = 0; i < postings.length; i++){
-            s.append(postings[i]);
+            s.append(postings[i].getNdoc());
             s.append(",");
         }
         return s.substring(0, s.length()-1);

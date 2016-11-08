@@ -32,7 +32,9 @@ public class Dictionary {
             this.postingList.addPosting(doc);
             this.nDocs++;
         }
-        // Futuramente guardar o termFrequency
+        else{
+            // ir buscar post e adicionar term frequency
+        }
     }
     
     public void removeDocument(int doc){
