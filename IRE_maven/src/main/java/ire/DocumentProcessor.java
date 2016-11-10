@@ -88,6 +88,9 @@ public class DocumentProcessor {
         
         return null;
     }
+    public int getSize(){
+        return documents.size();
+    }
     
     public void writeDocuments(){
         Document[] documentsArray = documents.toArray(new Document[0]);

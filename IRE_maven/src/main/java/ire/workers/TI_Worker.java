@@ -44,7 +44,7 @@ public class TI_Worker extends Thread{
             tokens =  tokenizer.tokenize(content, doc);
             
             indexer.indexToken(tokens, doc.getDocId());
-            
+            System.out.println(doc.getDocId());
             doc = docProc.getNextDocument();  
         }
         doc = null;

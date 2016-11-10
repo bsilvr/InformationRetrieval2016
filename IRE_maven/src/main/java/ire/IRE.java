@@ -29,7 +29,7 @@ public class IRE {
         // configurações
         String dir = "stacksample";
         int nthreads_dp = 2;
-        int nthreads_ti = 10;
+        int nthreads_ti = 5;
         
         ////////////////////////////////////////////////
         double startTime = System.currentTimeMillis();
@@ -89,6 +89,7 @@ public class IRE {
             }
         }
         docProc.finishedProcess();
+        System.out.println(docProc.getSize());
         
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime)/1000;

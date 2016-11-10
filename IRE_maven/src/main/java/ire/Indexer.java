@@ -53,7 +53,7 @@ public class Indexer {
         // ja temos o term frequency
         
         // calcular document lenght
-        float sum = 0;
+        /*float sum = 0;
         for(HashMap.Entry<Integer, Integer> entry : weight.entrySet()){ 
             sum += Math.pow(entry.getValue(), 2);
         }
@@ -63,9 +63,10 @@ public class Indexer {
         Iterator it = mySet.iterator();
         double wNorm = 0;
         while(it.hasNext()) {
-            wNorm = (1+Math.log(weight.get(it.hashCode()))) / doc_length;
-            index.dict.get(it.next().hashCode()).getPostingList().addPostWeight(docId, wNorm);
-        }
+            String tmp = (String)it.next();
+            wNorm = (1+Math.log(weight.get(tmp.hashCode()))) / doc_length;
+            index.dict.get(tmp.hashCode()).getPostingList().addPostWeight(docId, wNorm);
+        }*/
         
     }
     

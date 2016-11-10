@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 public class CsvProcessor {
     
     private static final Pattern TAG_REGEX = Pattern.compile("<code>(.+?)</code>");
+    private static Pattern pattern = Pattern.compile("(?s)<code>.*?</code>|(?s)<CODE>.*?</CODE>|<(.|\n)*?>");
     
     public static String process(Document doc){
         
@@ -87,10 +88,10 @@ public class CsvProcessor {
     }
 
     private static String parseTags(String string) {
-        string = string.replaceAll("(?s)<code>.*?</code>", "");
+        /*string = string.replaceAll("(?s)<code>.*?</code>", "");
         string = string.replaceAll("(?s)<CODE>.*?</CODE>", "");
-        string = string.replaceAll("<(.|\n)*?>", "");
-        System.out.println(string);
-        return string;
+        string = string.replaceAll("<(.|\n)*?>", "");*/
+        
+        return pattern.matcher(string).replaceAll("");
     }
 }
