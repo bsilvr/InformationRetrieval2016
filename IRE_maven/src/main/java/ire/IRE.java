@@ -34,6 +34,10 @@ public class IRE {
         String index_path = "index.txt";
         String stopWordsFile = "stopwords_en.txt";
         
+        // String documentMappingPath = "";
+        // boolean stemming = true;
+        // boolean removeStopWords = true;
+        
         ////////////////////////////////////////////////
         double startTime = System.currentTimeMillis();
         double endTime;
