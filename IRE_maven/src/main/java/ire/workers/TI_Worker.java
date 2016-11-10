@@ -7,7 +7,6 @@ package ire.workers;
 
 import ire.Document;
 import ire.DocumentProcessor;
-import ire.Index;
 import ire.Indexer;
 import ire.Tokenizer;
 import java.util.regex.Pattern;
@@ -25,10 +24,10 @@ public class TI_Worker extends Thread{
     Indexer indexer;
     String[] stopWordsArray;
 
-    public TI_Worker(DocumentProcessor docProc, Index idx, String[] stopWordsArray){
+    public TI_Worker(DocumentProcessor docProc, String[] stopWordsArray){
         this.docProc = docProc;
         this.stopWordsArray = stopWordsArray;
-        indexer = new Indexer(idx);
+        this.indexer = new Indexer();
     }
 
     @Override

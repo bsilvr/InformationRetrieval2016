@@ -31,6 +31,9 @@ public class IRE {
         int nthreads_dp = 2;
         int nthreads_ti = 5;
         
+        String index_path = "index.txt";
+        String stopWordsFile = "stopwords_en.txt";
+        
         ////////////////////////////////////////////////
         double startTime = System.currentTimeMillis();
         double endTime;
@@ -38,11 +41,11 @@ public class IRE {
         
         CorpusReader corpus = new CorpusReader();
         DocumentProcessor docProc = new DocumentProcessor();
-        Index idx = new Index();
         
         //Launching threads
         DP_Worker[] thread_pool_dp = new DP_Worker[nthreads_dp];
-        
+        TI_Worker[] thread_pool = new TI_Worker[nthreads_ti];
+  
         for(int i = 0; i < nthreads_dp; i++){
             thread_pool_dp[i] = new DP_Worker(corpus, docProc);
             thread_pool_dp[i].start();
@@ -64,7 +67,7 @@ public class IRE {
         System.out.println("Finished Reading Directory: "+totalTime+" seconds.");
 
         // Guardar stopwords numa Array List
-        File stopWords = new File("stopwords_en.txt");
+        File stopWords = new File(stopWordsFile);
         ArrayList<String> stopWordsList = new ArrayList<>();
         try(BufferedReader br = new BufferedReader(new FileReader(stopWords))) {
             for(String line; (line = br.readLine()) != null; ) {
@@ -75,9 +78,8 @@ public class IRE {
         }
         String[] stopWordsArray = stopWordsList.toArray(new String[0]);
         
-        TI_Worker[] thread_pool = new TI_Worker[nthreads_ti];
         for(int i = 0; i < nthreads_ti; i++){
-            thread_pool[i] = new TI_Worker(docProc, idx, stopWordsArray);
+            thread_pool[i] = new TI_Worker(docProc, stopWordsArray);
             thread_pool[i].start();
         }
         
@@ -107,7 +109,7 @@ public class IRE {
         totalTime = (endTime - startTime)/1000;
         System.out.println("Finished Indexing: "+totalTime+" seconds.");
         
-        Indexer indexer = new Indexer(idx);
+        Indexer indexer = new Indexer(index_path);
         indexer.writeIndex();
         docProc.writeDocuments();
                

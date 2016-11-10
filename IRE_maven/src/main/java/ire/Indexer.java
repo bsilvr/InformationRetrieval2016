@@ -9,11 +9,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,17 +18,16 @@ import java.util.logging.Logger;
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class Indexer {
-    final String index_path = "index.txt";
+    private String index_path;
     
-    
-    private Index index;
+    private static Index index = new Index();
     
     public Indexer(){
-        index = new Index();
+        index_path = "index.txt";
     }
     
-    public Indexer(Index idx){
-        index = idx;
+    public Indexer(String path){
+        index_path = path;
     }
     
     public void indexToken(String[] tokens, int docId){
