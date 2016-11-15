@@ -11,33 +11,49 @@ import java.util.Set;
 
 public class Index implements Serializable{
     
+    //HashMap<Integer, HashMap<Integer,Double>> dict;
+    //HashMap<Integer, String> words;
+    private int countID = 0;
+    private int termID;
+    
     HashMap<Integer, HashMap<Integer,Double>> dict;
-    HashMap<Integer, String> words;
+    HashMap<String, Integer> words;
+    
+    HashMap<Integer,Double> posts;
+    
+    // words passar a dar a key para o outro hashmap
             
     public Index(){
+        //dict = new HashMap<>();
+        //words = new HashMap<>();
         dict = new HashMap<>();
         words = new HashMap<>();
+        
+        posts = new HashMap<>();
     }
     
     public void addTerm(String term, int doc, double weight){
         // adiciona um termo no indice em que apareceu no doc.
         // se ja existir adicionar a posting list.
-        int hash = term.hashCode();
+      
+        Integer id = words.putIfAbsent(term, countID);
         
-        words.put(hash, term);
-        HashMap<Integer,Double> posts = dict.get(hash);
+        if(id != null){
+            termID = id;
+        }else{
+            termID = countID;
+            countID++;
+        }
+        
+        posts.put(doc,weight);
+        HashMap<Integer, Double> list = dict.putIfAbsent(termID, posts);
         //Post post = new Post(doc, weight);
-
-        if(posts == null){
-            posts= new HashMap<>();
-            posts.put(doc,weight);
-            
-            dict.put(hash, posts);
+        
+        if(list != null){
+            list.put(doc,weight);
         }
-        else{
-            //posts.add(post);
-            posts.put(doc,weight);
-        }
+        
+        posts.clear();
         
     }
     
@@ -63,7 +79,7 @@ public class Index implements Serializable{
         return dict.keySet();
     }
     
-    public HashMap<Integer,String> getSortedWords(){
+    public HashMap<String, Integer> getSortedWords(){
         return words;
     }
     

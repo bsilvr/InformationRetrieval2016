@@ -78,7 +78,7 @@ public class TI_Worker extends Thread{
             
             
             
-            /*if(doc.getDocId() == 10000){
+            /*if(doc.getDocId() == 100000 || doc.getDocId() == 0){
                 docCount++;
                 //writeIndex();
                 

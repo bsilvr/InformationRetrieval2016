@@ -14,7 +14,7 @@ import java.util.HashMap;
 public class Indexer {
     private String index_path;
     
-    private Index index = new Index();
+    private static Index index = new Index();
     
     public Indexer(){
         index_path = "index.txt";

@@ -82,7 +82,7 @@ public class CsvProcessor implements Processor{
     }
     
     @Override
-    public synchronized DocumentContent getDocument(){
+    public DocumentContent getDocument(){
         return buffer.getItem();
     }
         
