@@ -12,6 +12,7 @@ import ire.Tokenizer;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -46,13 +47,39 @@ public class TI_Worker extends Thread{
         String[] tokens;
         while(doc != null){            
             tokens =  tokenizer.tokenize(doc.getContent());
+            
             //Calcular pesos palavras e passar ao indexer para dar merge ao indice global.
-            indexer.indexToken(tokens, doc.getDocId());
+            HashMap<Integer,Integer> counts = new HashMap<>();
+            int count = 0;
+            for (int i = 0; i < tokens.length; i++){
+                
+                if(!counts.containsKey(tokens[i].hashCode())){
+                    counts.put(tokens[i].hashCode(), 1);   
+                   
+                }
+                
+                else{
+                    count = counts.get(tokens[i].hashCode());
+                    count++;
+                    counts.replace(tokens[i].hashCode(), count);
+                }
+                
+            }
+            double sum = 0;
+            HashMap<Integer,Double> weights = new HashMap<>();
+            for(HashMap.Entry<Integer, Integer> entry : counts.entrySet()){ 
+                sum += Math.pow(entry.getValue(), 2);
+                weights.put(entry.getKey(), 1+Math.log(counts.get(entry.getKey())));
+            }
+            double doc_length = Math.sqrt(sum);
+            
+            
+            indexer.indexToken(tokens, doc.getDocId(), weights, doc_length);
             
             
             
             /*if(doc.getDocId() == 10000){
-                //docCount++;
+                docCount++;
                 //writeIndex();
                 
                 //indexer = new Indexer();

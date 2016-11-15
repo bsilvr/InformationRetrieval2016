@@ -28,8 +28,8 @@ public class IRE {
     public static void main(String[] args) {
         // configurações
         String dir = "stacksample";
-        int nthreads_dp = 2;
-        int nthreads_ti = 200;
+        int nthreads_dp = 1;
+        int nthreads_ti = 100;
         
         String index_path = "index.txt";
         String stopWordsFile = "stopwords_en.txt";

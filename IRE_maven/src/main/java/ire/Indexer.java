@@ -5,6 +5,8 @@
  */
 package ire;
 
+import java.util.HashMap;
+
 /**
  *
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
@@ -12,7 +14,7 @@ package ire;
 public class Indexer {
     private String index_path;
     
-    private static Index index = new Index();
+    private Index index = new Index();
     
     public Indexer(){
         index_path = "index.txt";
@@ -22,39 +24,10 @@ public class Indexer {
         index_path = path;
     }
     
-    public void indexToken(String[] tokens, int docId){
-        //HashMap<Integer,Integer> weight = new HashMap<>();
+    public void indexToken(String[] tokens, int docId, HashMap<Integer,Double> weight, double doc_weight){
         for (int i = 0; i < tokens.length; i++){
-            index.addTerm(tokens[i], docId);
-            
-            //Calcular term frequency sem guardar no index
-            /*if(weight.containsKey(tokens[i].hashCode())){
-                int count = weight.get(tokens[i].hashCode());
-                count++;
-                weight.replace(tokens[i].hashCode(), count);
-            }
-            else{
-                weight.put(tokens[i].hashCode(), 1);
-            }*/
+            index.addTerm(tokens[i], docId, weight.get(tokens[i].hashCode())/doc_weight);
         }
-        // ja temos o term frequency
-        
-        // calcular document lenght
-        /*float sum = 0;
-        for(HashMap.Entry<Integer, Integer> entry : weight.entrySet()){ 
-            sum += Math.pow(entry.getValue(), 2);
-        }
-        double doc_length = Math.sqrt(sum);
-        
-        Set<String> mySet = new HashSet<>(Arrays.asList(tokens));
-        Iterator it = mySet.iterator();
-        double wNorm = 0;
-        while(it.hasNext()) {
-            String tmp = (String)it.next();
-            wNorm = (1+Math.log(weight.get(tmp.hashCode()))) / doc_length;
-            index.dict.get(tmp.hashCode()).getPostingList().addPostWeight(docId, wNorm);
-        }*/
-        
     }
     
     public Index getIndex(){

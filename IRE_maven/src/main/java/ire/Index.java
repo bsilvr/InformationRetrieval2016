@@ -6,17 +6,12 @@
 package ire;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-/**
- *
- * @author Bruno Silva <brunomiguelsilva@ua.pt>
- */
 public class Index implements Serializable{
     
-    HashMap<Integer, ArrayList<Post>> dict;
+    HashMap<Integer, HashMap<Integer,Double>> dict;
     HashMap<Integer, String> words;
             
     public Index(){
@@ -24,19 +19,26 @@ public class Index implements Serializable{
         words = new HashMap<>();
     }
     
-    public void addTerm(String term, int doc){
+    public void addTerm(String term, int doc, double weight){
         // adiciona um termo no indice em que apareceu no doc.
         // se ja existir adicionar a posting list.
         int hash = term.hashCode();
-        Dictionary d = dict.get(hash);
-        if(d != null){  
-            d.addDocument(doc);
-            dict.replace(hash, d);
-            return;
-        }
+        
         words.put(hash, term);
-        dict.put(hash, new Dictionary(doc));
-        //System.out.println(dict.size());
+        HashMap<Integer,Double> posts = dict.get(hash);
+        //Post post = new Post(doc, weight);
+
+        if(posts == null){
+            posts= new HashMap<>();
+            posts.put(doc,weight);
+            
+            dict.put(hash, posts);
+        }
+        else{
+            //posts.add(post);
+            posts.put(doc,weight);
+        }
+        
     }
     
     public Dictionary searchTerm(String term){
@@ -55,10 +57,7 @@ public class Index implements Serializable{
     public int size(){
         return dict.size();
     }
-    
-    public Dictionary get(int key){
-        return dict.get(key);
-    }
+
     
     public Set<Integer> keySet(){
         return dict.keySet();
