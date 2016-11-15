@@ -5,23 +5,22 @@
  */
 package ire;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
-public class Dictionary {
-    String term;
+public class Dictionary implements Serializable{
     int nDocs;
     PostingList postingList;
     
-    public Dictionary(String term){
-        this.term = term;
+    public Dictionary(){
         this.nDocs = 0;
         this.postingList = new PostingList();
     }
     
-    public Dictionary(String term, int doc){
-        this.term = term;
+    public Dictionary(int doc){
         this.nDocs = 1;
         this.postingList = new PostingList();
         this.postingList.addPosting(doc);
@@ -40,10 +39,6 @@ public class Dictionary {
     public void removeDocument(int doc){
         this.postingList.removePosting(doc);
         this.nDocs--;
-    }
-    
-    public String getTerm(){
-        return this.term;
     }
     
     public PostingList getPostingList(){

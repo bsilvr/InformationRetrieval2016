@@ -14,24 +14,18 @@ public class Document {
     static int id = 0;
     
     String filePath;
-    int docStartLine;
     int originalDocId;
     
     int docId;
     
-    public Document(String filePath, int docStartLine, int originalDocId){
+    public Document(String filePath, int originalDocId){
         this.docId = getID();
         this.filePath = filePath;
-        this.docStartLine = docStartLine;
         this.originalDocId = originalDocId;
     }
 
     public String getFilePath() {
         return filePath;
-    }
-
-    public int getDocStartLine() {
-        return docStartLine;
     }
 
     public int getDocId() {

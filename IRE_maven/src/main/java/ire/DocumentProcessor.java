@@ -5,8 +5,8 @@
  */
 package ire;
 
-import ire.DocumentProcessors.ArffProcessor;
 import ire.DocumentProcessors.CsvProcessor;
+import ire.DocumentProcessors.Processor;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -26,18 +26,21 @@ public class DocumentProcessor {
     private int currentDoc;
     private int ndocs;
     private int docsToProcess;
-    final String doc_path = "doc_dict.txt";    
+    final String doc_path = "doc_dict.txt";
+    private Processor proc;
+    private Buffer buffer;
     
-    public DocumentProcessor(){
+    public DocumentProcessor(int nBuffer){
         documents = new ArrayList<>();
         currentDoc = 0;
         ndocs = 0;
         docsToProcess = 0;
+        this.buffer = new Buffer(nBuffer);
     }
     
-    public synchronized void processDocument(CorpusFile cfile){
+    public void processDocument(CorpusFile cfile){
         // Ver a extensao e enviar o path para a função adequada.
-        if(cfile.getExtension().equals("arff")){
+        /*if(cfile.getExtension().equals("arff")){
             ArrayList<Document> tmp = ArffProcessor.identify(cfile);
             synchronized(documents){
                 documents.addAll(tmp);
@@ -45,12 +48,13 @@ public class DocumentProcessor {
                 notifyAll();
             }
         }
-        else if(cfile.getExtension().equals("csv")){
-            ArrayList<Document> tmp = CsvProcessor.identify(cfile);
+        else*/ 
+        if(cfile.getExtension().equals("csv")){
+            proc = new CsvProcessor(buffer);
+            ArrayList<Document> tmp = proc.process(cfile);
             synchronized(documents){
                 documents.addAll(tmp);
                 docsToProcess += tmp.size();
-                notifyAll();
             }
         }
     }
@@ -59,35 +63,10 @@ public class DocumentProcessor {
         return documents.toArray(new Document[0]);
     }
     
-    public synchronized Document getNextDocument(){
-        // the end
-        if(currentDoc == ndocs && ndocs != 0) {
-            return null;
-        }
-        if(currentDoc >= docsToProcess){
-            try {
-                wait();
-            } catch (InterruptedException ex) {
-                Logger.getLogger(DocumentProcessor.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        // the end
-        if(currentDoc == ndocs && ndocs != 0) {
-            return null;
-        }
-        return documents.get(currentDoc++);
+    public DocumentContent getNextDocument(){
+        return proc.getDocument();
     }
        
-    public String getDocumentContent(Document doc){
-        if (doc.getFilePath().endsWith(".arff")){
-            return ArffProcessor.process(doc);
-        } 
-        else if (doc.getFilePath().endsWith(".csv")){
-            return CsvProcessor.process(doc);
-        } 
-        
-        return null;
-    }
     public int getSize(){
         return documents.size();
     }

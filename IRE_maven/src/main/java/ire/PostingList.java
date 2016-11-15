@@ -5,19 +5,19 @@
  */
 package ire;
 
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.io.Serializable;
+import java.util.LinkedList;
 
 /**
  *
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
-public class PostingList {
+public class PostingList implements Serializable{
     
-    private SortedSet<Post> docs;
+    private LinkedList<Post> docs;
     
     public PostingList(){
-        this.docs = new TreeSet<>();
+        this.docs = new LinkedList<>();
     }
     
     public void addPosting(int doc){

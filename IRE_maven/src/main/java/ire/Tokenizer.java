@@ -30,13 +30,13 @@ public class Tokenizer {
         this.as_space = as_space;
     }
     
-    public String[] tokenize(String content, Document doc){
+    public String[] tokenize(String content){
         
         content = as_space.matcher(content).replaceAll("");
         String [] words = space_char.split(content);
-        
+        String word;
         for(int i = 0; i < words.length; i++){
-            String word = transform(words[i]);
+            word = transform(words[i]);
             if(word != null){
                 //Token tk = new Token(word, doc);
                 tokens.add(word);

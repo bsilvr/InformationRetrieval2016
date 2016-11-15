@@ -29,10 +29,13 @@ public class IRE {
         // configurações
         String dir = "stacksample";
         int nthreads_dp = 2;
-        int nthreads_ti = 5;
+        int nthreads_ti = 200;
         
         String index_path = "index.txt";
         String stopWordsFile = "stopwords_en.txt";
+        
+        //Max documents in ram
+        int nBuffer = 100;
         
         // String documentMappingPath = "";
         // boolean stemming = true;
@@ -44,32 +47,8 @@ public class IRE {
         double totalTime;
         
         CorpusReader corpus = new CorpusReader();
-        DocumentProcessor docProc = new DocumentProcessor();
+        DocumentProcessor docProc = new DocumentProcessor(nBuffer);
         
-        //Launching threads
-        DP_Worker[] thread_pool_dp = new DP_Worker[nthreads_dp];
-        TI_Worker[] thread_pool = new TI_Worker[nthreads_ti];
-  
-        for(int i = 0; i < nthreads_dp; i++){
-            thread_pool_dp[i] = new DP_Worker(corpus, docProc);
-            thread_pool_dp[i].start();
-        }
-
-        // Listar ficheiros, e respetivas extenções, de um determinado diretorio
-        corpus.readDir(dir);
-        
-        for(int i = 0; i < nthreads_dp; i++){
-            try {
-                thread_pool_dp[i].join();
-            } catch (InterruptedException ex) {
-                Logger.getLogger(IRE.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        
-        endTime = System.currentTimeMillis();
-        totalTime = (endTime - startTime)/1000;
-        System.out.println("Finished Reading Directory: "+totalTime+" seconds.");
-
         // Guardar stopwords numa Array List
         File stopWords = new File(stopWordsFile);
         ArrayList<String> stopWordsList = new ArrayList<>();
@@ -82,11 +61,22 @@ public class IRE {
         }
         String[] stopWordsArray = stopWordsList.toArray(new String[0]);
         
+        // Listar ficheiros, e respetivas extenções, de um determinado diretorio
+        corpus.readDir(dir);
+        
+        //Launching threads
+        DP_Worker[] thread_pool_dp = new DP_Worker[nthreads_dp];
+        TI_Worker[] thread_pool = new TI_Worker[nthreads_ti];
+  
+        for(int i = 0; i < nthreads_dp; i++){
+            thread_pool_dp[i] = new DP_Worker(corpus, docProc);
+            thread_pool_dp[i].start();
+        }
         for(int i = 0; i < nthreads_ti; i++){
             thread_pool[i] = new TI_Worker(docProc, stopWordsArray);
             thread_pool[i].start();
         }
-        
+
         for(int i = 0; i < nthreads_dp; i++){
             try {
                 thread_pool_dp[i].join();
@@ -94,13 +84,6 @@ public class IRE {
                 Logger.getLogger(IRE.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        docProc.finishedProcess();
-        System.out.println(docProc.getSize());
-        
-        endTime = System.currentTimeMillis();
-        totalTime = (endTime - startTime)/1000;
-        System.out.println("Finished Processed Documents: "+totalTime+" seconds.");
-        
         for(int i = 0; i < nthreads_ti; i++){
             try {
                 thread_pool[i].join();
@@ -113,9 +96,9 @@ public class IRE {
         totalTime = (endTime - startTime)/1000;
         System.out.println("Finished Indexing: "+totalTime+" seconds.");
         
-        Indexer indexer = new Indexer(index_path);
-        indexer.writeIndex();
-        docProc.writeDocuments();
+        //Indexer indexer = new Indexer(index_path);
+        //indexer.writeIndex();
+        //docProc.writeDocuments();
                
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime)/1000;

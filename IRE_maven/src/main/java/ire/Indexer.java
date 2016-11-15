@@ -5,14 +5,6 @@
  */
 package ire;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  *
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
@@ -31,19 +23,19 @@ public class Indexer {
     }
     
     public void indexToken(String[] tokens, int docId){
-        HashMap<Integer,Integer> weight = new HashMap<>();
+        //HashMap<Integer,Integer> weight = new HashMap<>();
         for (int i = 0; i < tokens.length; i++){
             index.addTerm(tokens[i], docId);
             
             //Calcular term frequency sem guardar no index
-            if(weight.containsKey(tokens[i].hashCode())){
+            /*if(weight.containsKey(tokens[i].hashCode())){
                 int count = weight.get(tokens[i].hashCode());
                 count++;
                 weight.replace(tokens[i].hashCode(), count);
             }
             else{
                 weight.put(tokens[i].hashCode(), 1);
-            }
+            }*/
         }
         // ja temos o term frequency
         
@@ -65,7 +57,11 @@ public class Indexer {
         
     }
     
-    public void writeIndex(){
+    public Index getIndex(){
+        return index;
+    }
+    
+    /*public void writeIndex(){
         File fl = new File(index_path);
         PrintWriter writer;
         try {
@@ -74,12 +70,12 @@ public class Indexer {
             for(String i: index.getSortedWords()){
                 Dictionary d = index.get(i.hashCode());
                 
-                writer.println(d.getTerm()+"-"+d.getnDocs()+"-"+d.getPostingList().toString());
+                writer.println(i+"-"+d.getnDocs()+"-"+d.getPostingList().toString());
             }
             
             writer.close();
         } catch (FileNotFoundException | UnsupportedEncodingException ex) {
             Logger.getLogger(Indexer.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
+    }*/
 }

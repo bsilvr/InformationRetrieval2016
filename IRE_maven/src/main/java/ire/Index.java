@@ -5,36 +5,38 @@
  */
 package ire;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 /**
  *
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
-public class Index {
+public class Index implements Serializable{
     
-    HashMap<Integer, Dictionary> dict;
-    SortedSet<String> words;
+    HashMap<Integer, ArrayList<Post>> dict;
+    HashMap<Integer, String> words;
             
     public Index(){
         dict = new HashMap<>();
-        words = new TreeSet<>();
+        words = new HashMap<>();
     }
     
-    public synchronized void addTerm(String term, int doc){
+    public void addTerm(String term, int doc){
         // adiciona um termo no indice em que apareceu no doc.
         // se ja existir adicionar a posting list.
-        if(dict.containsKey(term.hashCode())){
-            Dictionary d = dict.get(term.hashCode());
+        int hash = term.hashCode();
+        Dictionary d = dict.get(hash);
+        if(d != null){  
             d.addDocument(doc);
-            dict.replace(term.hashCode(), d);
+            dict.replace(hash, d);
             return;
         }
-        words.add(term);
-        dict.put(term.hashCode(), new Dictionary(term, doc));
+        words.put(hash, term);
+        dict.put(hash, new Dictionary(doc));
+        //System.out.println(dict.size());
     }
     
     public Dictionary searchTerm(String term){
@@ -62,7 +64,7 @@ public class Index {
         return dict.keySet();
     }
     
-    public SortedSet<String> getSortedWords(){
+    public HashMap<Integer,String> getSortedWords(){
         return words;
     }
     

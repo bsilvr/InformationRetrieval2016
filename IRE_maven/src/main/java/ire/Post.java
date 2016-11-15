@@ -5,11 +5,13 @@
  */
 package ire;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
-public class Post implements Comparable{
+public class Post implements Comparable,Serializable{
     private int nDoc;
     private double wtnorm;
     
