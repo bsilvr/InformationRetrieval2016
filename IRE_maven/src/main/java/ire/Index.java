@@ -32,7 +32,7 @@ public class Index implements Serializable{
         posts = new HashMap<>();
     }
     
-    public void addTerm(String term, int doc, double weight){
+    public synchronized void addTerm(String term, int doc, double weight){
         // adiciona um termo no indice em que apareceu no doc.
         // se ja existir adicionar a posting list.
       

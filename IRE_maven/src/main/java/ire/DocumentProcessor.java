@@ -66,6 +66,10 @@ public class DocumentProcessor {
     public DocumentContent getNextDocument(){
         return proc.getDocument();
     }
+    
+    public void setFinish(){
+        buffer.setFinish();
+    }
        
     public int getSize(){
         return documents.size();

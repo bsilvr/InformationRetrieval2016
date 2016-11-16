@@ -28,68 +28,54 @@ public class TI_Worker extends Thread{
     private final Pattern space_char = Pattern.compile("\\s+");
     private final Pattern as_space = Pattern.compile("[-()]");
     
-    private DocumentProcessor docProc;
+    private DocumentContent doc;
     private Indexer indexer;
     private String[] stopWordsArray;
     private int indexCount = 0;
     private int docCount = 0;
 
-    public TI_Worker(DocumentProcessor docProc, String[] stopWordsArray){
-        this.docProc = docProc;
+    public TI_Worker(DocumentContent doc, String[] stopWordsArray){
+        this.doc = doc;
         this.stopWordsArray = stopWordsArray;
         this.indexer = new Indexer();
     }
 
     @Override
     public void run() {
-        DocumentContent doc = docProc.getNextDocument();
+       
         Tokenizer tokenizer = new Tokenizer(stopWordsArray, pattern, space_char, as_space);
         String[] tokens;
-        while(doc != null){            
-            tokens =  tokenizer.tokenize(doc.getContent());
+        tokens =  tokenizer.tokenize(doc.getContent());
             
-            //Calcular pesos palavras e passar ao indexer para dar merge ao indice global.
-            HashMap<Integer,Integer> counts = new HashMap<>();
-            int count = 0;
-            for (int i = 0; i < tokens.length; i++){
-                
-                if(!counts.containsKey(tokens[i].hashCode())){
-                    counts.put(tokens[i].hashCode(), 1);   
-                   
-                }
-                
-                else{
-                    count = counts.get(tokens[i].hashCode());
-                    count++;
-                    counts.replace(tokens[i].hashCode(), count);
-                }
-                
+        //Calcular pesos palavras e passar ao indexer para dar merge ao indice global.
+        HashMap<Integer,Integer> counts = new HashMap<>();
+        int count = 0;
+        for (int i = 0; i < tokens.length; i++){
+
+            if(!counts.containsKey(tokens[i].hashCode())){
+                counts.put(tokens[i].hashCode(), 1);   
+
             }
-            double sum = 0;
-            HashMap<Integer,Double> weights = new HashMap<>();
-            for(HashMap.Entry<Integer, Integer> entry : counts.entrySet()){ 
-                sum += Math.pow(entry.getValue(), 2);
-                weights.put(entry.getKey(), 1+Math.log(counts.get(entry.getKey())));
+
+            else{
+                count = counts.get(tokens[i].hashCode());
+                count++;
+                counts.replace(tokens[i].hashCode(), count);
             }
-            double doc_length = Math.sqrt(sum);
-            
-            
-            indexer.indexToken(tokens, doc.getDocId(), weights, doc_length);
-            
-            
-            
-            /*if(doc.getDocId() == 100000 || doc.getDocId() == 0){
-                docCount++;
-                //writeIndex();
-                
-                //indexer = new Indexer();
-                //System.gc();
-                
-            }*/
-            System.out.println(doc.getDocId());
-            
-            doc = docProc.getNextDocument(); 
+
         }
+        double sum = 0;
+        HashMap<Integer,Double> weights = new HashMap<>();
+        for(HashMap.Entry<Integer, Integer> entry : counts.entrySet()){ 
+            sum += Math.pow(entry.getValue(), 2);
+            weights.put(entry.getKey(), 1+Math.log(counts.get(entry.getKey())));
+        }
+        double doc_length = Math.sqrt(sum);
+
+        
+        indexer.indexToken(tokens, doc.getDocId(), weights, doc_length);
+        //System.out.println(doc.getDocId());
+
     }
     
     public void writeIndex(){

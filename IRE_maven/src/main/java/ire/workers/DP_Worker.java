@@ -24,10 +24,12 @@ public class DP_Worker extends Thread{
     
     @Override
     public void run() {
+        
         CorpusFile file = corpus.getNextFile();
         while(file != null){
             docProc.processDocument(file);
             file = corpus.getNextFile();
         }
+        docProc.setFinish();
     }
 }

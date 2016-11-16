@@ -61,19 +61,27 @@ public class CsvProcessor implements Processor{
                     }catch(ArrayIndexOutOfBoundsException e) {
                         title = false;
                     }
-                    current = parseTags(currentDoc.toString());
+                    
                 }else{
                     currentDoc.append(csvRecord.get(5));
                     if(title){
                         currentDoc.append(csvRecord.get(6));
                     }
-                    current = parseTags(currentDoc.toString());
                 }
+                current = currentDoc.toString();
+                if(current == null || current.length() == 0){
+                        continue;
+                }
+                current = parseTags(current);
                 
                 doc = new Document(file.getPath(), Integer.parseInt(csvRecord.get(0)));
                 documents.add(doc);
+                
                 buffer.addItem(new DocumentContent(current, doc.getDocId()));
+                
                 currentDoc.setLength(0);
+               
+                
             }
         } catch (IOException ex) {
             Logger.getLogger(CsvProcessor.class.getName()).log(Level.SEVERE, null, ex);

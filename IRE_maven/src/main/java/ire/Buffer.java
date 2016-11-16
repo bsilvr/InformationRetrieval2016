@@ -17,10 +17,12 @@ public class Buffer {
     private int nDocs;
     private final DocumentContent[] buffer;
     private int nBuffer = 0;
+    private boolean finish = false;
     
     public Buffer(int nDocs){
         this.nDocs = nDocs;
         buffer = new DocumentContent[nDocs];
+        finish = false;
     }
     
     public synchronized void addItem(DocumentContent d){
@@ -40,6 +42,9 @@ public class Buffer {
     
     public synchronized DocumentContent getItem(){
         while(nBuffer <= 0){
+            if (finish){
+                return null;
+            }
             try {
                 wait();
             } catch (InterruptedException ex) {
@@ -51,6 +56,10 @@ public class Buffer {
         notifyAll();
         //System.err.println(nBuffer);
         return c;
+    }
+    
+    public void setFinish(){
+        finish=true;
     }
     
 }

@@ -7,6 +7,7 @@ package ire;
 
 import ire.DocumentProcessors.ArffProcessor;
 import ire.workers.DP_Worker;
+import ire.workers.TI_Manager;
 import ire.workers.TI_Worker;
 import java.io.BufferedReader;
 import java.io.File;
@@ -29,7 +30,7 @@ public class IRE {
         // configurações
         String dir = "stacksample";
         int nthreads_dp = 1;
-        int nthreads_ti = 100;
+        int nthreads_ti = 200;
         
         String index_path = "index.txt";
         String stopWordsFile = "stopwords_en.txt";
@@ -66,16 +67,15 @@ public class IRE {
         
         //Launching threads
         DP_Worker[] thread_pool_dp = new DP_Worker[nthreads_dp];
-        TI_Worker[] thread_pool = new TI_Worker[nthreads_ti];
+        //TI_Worker[] thread_pool = new TI_Worker[nthreads_ti];
   
         for(int i = 0; i < nthreads_dp; i++){
             thread_pool_dp[i] = new DP_Worker(corpus, docProc);
             thread_pool_dp[i].start();
         }
-        for(int i = 0; i < nthreads_ti; i++){
-            thread_pool[i] = new TI_Worker(docProc, stopWordsArray);
-            thread_pool[i].start();
-        }
+        
+        TI_Manager timnger = new TI_Manager(docProc, stopWordsArray);
+        timnger.start();
 
         for(int i = 0; i < nthreads_dp; i++){
             try {
@@ -84,12 +84,11 @@ public class IRE {
                 Logger.getLogger(IRE.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        for(int i = 0; i < nthreads_ti; i++){
-            try {
-                thread_pool[i].join();
-            } catch (InterruptedException ex) {
-                Logger.getLogger(IRE.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        
+        try {
+            timnger.join();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(IRE.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         endTime = System.currentTimeMillis();
