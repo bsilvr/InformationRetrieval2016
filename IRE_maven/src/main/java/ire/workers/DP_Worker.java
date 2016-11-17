@@ -29,7 +29,10 @@ public class DP_Worker extends Thread{
         while(file != null){
             docProc.processDocument(file);
             file = corpus.getNextFile();
+            System.out.println("New Doc");
         }
+        System.out.println("DP out");
+
         docProc.setFinish();
     }
 }

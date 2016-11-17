@@ -66,15 +66,16 @@ public class CorpusReader {
     }
     
     public synchronized CorpusFile getNextFile(){
+        if(currentFile == corpusIterator.length) {
+            return null;
+        }
         if(!finishedReadDir){
             try {
                 wait();
             } catch (InterruptedException ex) {
             }
         }
-        if(currentFile == corpusIterator.length) {
-            return null;
-        }
+        
         return corpusIterator[currentFile++];
     }
 }

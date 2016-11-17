@@ -28,11 +28,9 @@ public class IRE {
      */
     public static void main(String[] args) {
         // configurações
-        String dir = "stacksample";
         int nthreads_dp = 1;
-        int nthreads_ti = 200;
         
-        String index_path = "index.txt";
+        String dir = "stacksample";
         String stopWordsFile = "stopwords_en.txt";
         
         //Max documents in ram
@@ -67,7 +65,6 @@ public class IRE {
         
         //Launching threads
         DP_Worker[] thread_pool_dp = new DP_Worker[nthreads_dp];
-        //TI_Worker[] thread_pool = new TI_Worker[nthreads_ti];
   
         for(int i = 0; i < nthreads_dp; i++){
             thread_pool_dp[i] = new DP_Worker(corpus, docProc);
@@ -91,17 +88,12 @@ public class IRE {
             Logger.getLogger(IRE.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+        System.out.println(Thread.activeCount());
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime)/1000;
         System.out.println("Finished Indexing: "+totalTime+" seconds.");
-        
-        //Indexer indexer = new Indexer(index_path);
-        //indexer.writeIndex();
-        //docProc.writeDocuments();
-               
-        endTime = System.currentTimeMillis();
-        totalTime = (endTime - startTime)/1000;
-        System.out.println("Finished writing index to file: "+totalTime+" seconds.");
+        Indexer last = new Indexer();
+        System.out.println("sa");
     }
     
 }

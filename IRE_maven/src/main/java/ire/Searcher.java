@@ -19,9 +19,4 @@ public class Searcher {
     public Searcher(Index idx){
         index = idx;
     }
-    
-    public Dictionary searchTerm(String term){
-        return index.searchTerm(term);
-    }
-    
 }

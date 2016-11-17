@@ -57,11 +57,6 @@ public class Index implements Serializable{
         
     }
     
-    public Dictionary searchTerm(String term){
-        //retorna informação sobre o termo encontrado
-        return null;
-    }
-    
     public void removeTerm(String Term){
         // remove termo do indice
     }

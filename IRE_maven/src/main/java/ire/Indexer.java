@@ -33,22 +33,4 @@ public class Indexer {
     public Index getIndex(){
         return index;
     }
-    
-    /*public void writeIndex(){
-        File fl = new File(index_path);
-        PrintWriter writer;
-        try {
-            writer = new PrintWriter(fl, "UTF-8");
-            
-            for(String i: index.getSortedWords()){
-                Dictionary d = index.get(i.hashCode());
-                
-                writer.println(i+"-"+d.getnDocs()+"-"+d.getPostingList().toString());
-            }
-            
-            writer.close();
-        } catch (FileNotFoundException | UnsupportedEncodingException ex) {
-            Logger.getLogger(Indexer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }*/
 }

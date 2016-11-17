@@ -42,14 +42,15 @@ public class TI_Manager  extends Thread{
         }
         buf = docProc.getNextDocument();
         while(buf != null){
-            //if(Thread.activeCount() < 1000){
+            if(Thread.activeCount() < 500){
                 thrd = new TI_Worker(buf, stopWordsArray);
                 thrd.start();
                 buf = docProc.getNextDocument();
-            //}
+            }
             
             //System.out.println(Thread.activeCount());
         }
+        System.out.println("Manageer out");
     }
     
 }

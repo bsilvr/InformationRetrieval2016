@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class Buffer {
-    private int nDocs;
+    private final int nDocs;
     private final DocumentContent[] buffer;
     private int nBuffer = 0;
     private boolean finish = false;
@@ -58,8 +58,10 @@ public class Buffer {
         return c;
     }
     
-    public void setFinish(){
+    public synchronized void setFinish(){
+        
         finish=true;
+        notifyAll();
     }
     
 }

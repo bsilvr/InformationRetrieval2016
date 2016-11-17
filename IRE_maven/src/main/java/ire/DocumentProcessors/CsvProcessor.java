@@ -26,9 +26,9 @@ import org.apache.commons.csv.CSVRecord;
  */
 public class CsvProcessor implements Processor{
     
-    private Buffer buffer;
+    private final Buffer buffer;
     
-    private static Pattern pattern = Pattern.compile("(?s)<code>.*?</code>|(?s)<CODE>.*?</CODE>|<(.|\n)*?>");
+    private final static Pattern PATTERN = Pattern.compile("(?s)<code>.*?</code>|(?s)<CODE>.*?</CODE>|<(.)*?>");
     
     public CsvProcessor(Buffer b){
         this.buffer = b;
@@ -68,12 +68,9 @@ public class CsvProcessor implements Processor{
                         currentDoc.append(csvRecord.get(6));
                     }
                 }
-                current = currentDoc.toString();
-                if(current == null || current.length() == 0){
-                        continue;
-                }
+                current = currentDoc.toString();              
                 current = parseTags(current);
-                
+
                 doc = new Document(file.getPath(), Integer.parseInt(csvRecord.get(0)));
                 documents.add(doc);
                 
@@ -98,7 +95,6 @@ public class CsvProcessor implements Processor{
         /*string = string.replaceAll("(?s)<code>.*?</code>", "");
         string = string.replaceAll("(?s)<CODE>.*?</CODE>", "");
         string = string.replaceAll("<(.|\n)*?>", "");*/
-        
-        return pattern.matcher(string).replaceAll("");
+        return PATTERN.matcher(string).replaceAll("");
     }
 }
