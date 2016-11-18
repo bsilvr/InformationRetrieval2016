@@ -6,7 +6,6 @@
 package ire.workers;
 
 import ire.DocumentContent;
-import ire.DocumentProcessor;
 import ire.Indexer;
 import ire.Tokenizer;
 import java.io.FileOutputStream;
@@ -65,10 +64,12 @@ public class TI_Worker extends Thread{
 
         }
         double sum = 0;
+        double tmp = 0;
         HashMap<Integer,Double> weights = new HashMap<>();
         for(HashMap.Entry<Integer, Integer> entry : counts.entrySet()){ 
-            sum += Math.pow(entry.getValue(), 2);
-            weights.put(entry.getKey(), 1+Math.log(counts.get(entry.getKey())));
+            tmp = 1+Math.log(counts.get(entry.getKey()));
+            sum += Math.pow(tmp, 2);
+            weights.put(entry.getKey(), tmp);
         }
         double doc_length = Math.sqrt(sum);
 
