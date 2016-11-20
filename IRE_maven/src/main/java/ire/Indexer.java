@@ -25,9 +25,10 @@ public class Indexer {
     }
     
     public void indexToken(String[] tokens, int docId, HashMap<Integer,Double> weight, double doc_weight){
-        for (int i = 0; i < tokens.length; i++){
+        for(int i = 0; i < tokens.length; i++){
             index.addTerm(tokens[i], docId, weight.get(tokens[i].hashCode())/doc_weight);
         }
+        System.out.println(docId);
     }
     
     public Index getIndex(){

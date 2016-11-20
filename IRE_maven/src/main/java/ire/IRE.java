@@ -93,7 +93,7 @@ public class IRE {
         totalTime = (endTime - startTime)/1000;
         System.out.println("Finished Indexing: "+totalTime+" seconds.");
         Indexer last = new Indexer();
-        System.out.println("sa");
+        System.out.println(last.getIndex().dict.get(18));
     }
     
 }

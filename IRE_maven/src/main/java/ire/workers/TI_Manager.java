@@ -42,7 +42,7 @@ public class TI_Manager  extends Thread{
         }
         buf = docProc.getNextDocument();
         while(buf != null){
-            if(Thread.activeCount() < 500){
+            if(Thread.activeCount() < 100){
                 thrd = new TI_Worker(buf, stopWordsArray);
                 thrd.start();
                 buf = docProc.getNextDocument();

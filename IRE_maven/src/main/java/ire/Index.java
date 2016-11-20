@@ -18,43 +18,40 @@ public class Index implements Serializable{
     
     HashMap<Integer, HashMap<Integer,Double>> dict;
     HashMap<String, Integer> words;
-    
     HashMap<Integer,Double> posts;
-    
+
     // words passar a dar a key para o outro hashmap
             
     public Index(){
         //dict = new HashMap<>();
         //words = new HashMap<>();
+        posts = new HashMap<>();
         dict = new HashMap<>();
         words = new HashMap<>();
-        
-        posts = new HashMap<>();
     }
     
     public synchronized void addTerm(String term, int doc, double weight){
         // adiciona um termo no indice em que apareceu no doc.
         // se ja existir adicionar a posting list.
-      
-        Integer id = words.putIfAbsent(term, countID);
-        
-        if(id != null){
-            termID = id;
-        }else{
+        if(words.containsKey(term)){ 
+            termID = words.get(term);
+        }
+        else{
+            words.put(term, countID);
             termID = countID;
             countID++;
         }
         
-        posts.put(doc,weight);
-        HashMap<Integer, Double> list = dict.putIfAbsent(termID, posts);
-        //Post post = new Post(doc, weight);
-        
-        if(list != null){
-            list.put(doc,weight);
+        if(dict.containsKey(termID)){ 
+            dict.get(termID).put(doc,weight);
         }
-        
+        else{
+            HashMap<Integer,Double> posts = new HashMap<>();
+            posts.put(doc, weight);
+            dict.put(termID, posts);
+        }
+
         posts.clear();
-        
     }
     
     public void removeTerm(String Term){
