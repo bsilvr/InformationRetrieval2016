@@ -24,11 +24,16 @@ public class Indexer {
         index_path = path;
     }
     
-    public void indexToken(String[] tokens, int docId, HashMap<Integer,Double> weight, double doc_weight){
-        for(int i = 0; i < tokens.length; i++){
-            index.addTerm(tokens[i], docId, weight.get(tokens[i].hashCode())/doc_weight);
+    public void indexToken(int docId, HashMap<String,Double> weight, double doc_weight){
+        for(HashMap.Entry<String, Double> entry : weight.entrySet()){
+            index.addTerm(entry.getKey(), docId, weight.get(entry.getKey())/doc_weight);
         }
-        System.out.println(docId);
+        //if(docId%100000 ==0){
+            System.out.println(docId);
+        //}
+        if (docId%400000==0 && docId != 0){
+            index.writeIndex();
+        }
     }
     
     public Index getIndex(){

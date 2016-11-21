@@ -5,27 +5,29 @@
  */
 package ire;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Set;
 
 public class Index implements Serializable{
+    private final String basefolder = "indexes/";
     
-    //HashMap<Integer, HashMap<Integer,Double>> dict;
-    //HashMap<Integer, String> words;
+    private int indexCount = 0;
     private int countID = 0;
     private int termID;
     
     HashMap<Integer, HashMap<Integer,Double>> dict;
-    HashMap<String, Integer> words;
-    HashMap<Integer,Double> posts;
+    final HashMap<String, Integer> words;
+    private HashMap<Integer,Double> posts;
 
     // words passar a dar a key para o outro hashmap
             
     public Index(){
         //dict = new HashMap<>();
         //words = new HashMap<>();
-        posts = new HashMap<>();
         dict = new HashMap<>();
         words = new HashMap<>();
     }
@@ -46,12 +48,16 @@ public class Index implements Serializable{
             dict.get(termID).put(doc,weight);
         }
         else{
-            HashMap<Integer,Double> posts = new HashMap<>();
+            posts = new HashMap<>();
             posts.put(doc, weight);
             dict.put(termID, posts);
         }
-
-        posts.clear();
+        
+        // if free memory < 10mb
+        /*if (Runtime.getRuntime().freeMemory() < 10485760){
+            writeIndex();
+        }
+        else*/
     }
     
     public void removeTerm(String Term){
@@ -73,6 +79,31 @@ public class Index implements Serializable{
     
     public HashMap<String, Integer> getSortedWords(){
         return words;
+    }
+    
+    public synchronized void writeIndex(){
+        // Write to file
+        System.err.println("Current Words Size: " + words.size());
+        System.out.println("Writing....");
+        ObjectOutputStream oos = null;
+        try {
+            String filename = basefolder + "index_" + indexCount;
+            indexCount++;
+            oos = new ObjectOutputStream(new FileOutputStream(filename));
+            oos.writeObject(dict);
+            oos.close();
+        } catch (IOException ex) {
+        } finally {
+            try {
+                oos.close();
+            } catch (IOException ex) {
+            }
+        }
+        
+        // Create new
+        dict = null;
+        System.gc();
+        dict = new HashMap<>();
     }
     
 }

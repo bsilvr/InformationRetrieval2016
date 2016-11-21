@@ -8,12 +8,7 @@ package ire.workers;
 import ire.DocumentContent;
 import ire.Indexer;
 import ire.Tokenizer;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
@@ -21,52 +16,46 @@ import java.util.regex.Pattern;
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class TI_Worker extends Thread{
-    private String basefolder = "indexes/";
+    private final String basefolder = "indexes/";
     
-    private final Pattern pattern = Pattern.compile("\\W");
-    private final Pattern space_char = Pattern.compile("\\s+");
-    private final Pattern as_space = Pattern.compile("[-()]");
+    private static final Pattern pattern = Pattern.compile("\\W");
+    private static final Pattern space_char = Pattern.compile("\\s+");
+    private static final Pattern as_space = Pattern.compile("[-()]");
+    
     
     private DocumentContent doc;
     private Indexer indexer;
-    private String[] stopWordsArray;
-    private int indexCount = 0;
-    private int docCount = 0;
+    private Tokenizer tokenizer;
 
-    public TI_Worker(DocumentContent doc, String[] stopWordsArray){
+    public TI_Worker(DocumentContent doc, Indexer indexer, String[] stopWordsArray){
         this.doc = doc;
-        this.stopWordsArray = stopWordsArray;
-        this.indexer = new Indexer();
+        this.indexer = indexer;
+        this.tokenizer = new Tokenizer(stopWordsArray);
+
     }
 
     @Override
     public void run() {
        
-        Tokenizer tokenizer = new Tokenizer(stopWordsArray, pattern, space_char, as_space);
         String[] tokens;
-        tokens =  tokenizer.tokenize(doc.getContent());
+        tokens = tokenizer.tokenize(doc.getContent());
             
         //Calcular pesos palavras e passar ao indexer para dar merge ao indice global.
-        HashMap<Integer,Integer> counts = new HashMap<>();
-        int count = 0;
-        for (int i = 0; i < tokens.length; i++){
-
-            if(!counts.containsKey(tokens[i].hashCode())){
-                counts.put(tokens[i].hashCode(), 1);   
-
-            }
-
-            else{
-                count = counts.get(tokens[i].hashCode());
+        HashMap<String,Integer> counts = new HashMap<>();
+        int count;
+        for (String token : tokens) {
+            if (!counts.containsKey(token)) {
+                counts.put(token, 1);
+            } else {
+                count = counts.get(token);
                 count++;
-                counts.replace(tokens[i].hashCode(), count);
+                counts.replace(token, count);
             }
-
         }
         double sum = 0;
         double tmp = 0;
-        HashMap<Integer,Double> weights = new HashMap<>();
-        for(HashMap.Entry<Integer, Integer> entry : counts.entrySet()){ 
+        HashMap<String,Double> weights = new HashMap<>();
+        for(HashMap.Entry<String, Integer> entry : counts.entrySet()){ 
             tmp = 1+Math.log(counts.get(entry.getKey()));
             sum += Math.pow(tmp, 2);
             weights.put(entry.getKey(), tmp);
@@ -74,11 +63,17 @@ public class TI_Worker extends Thread{
         double doc_length = Math.sqrt(sum);
 
         
-        indexer.indexToken(tokens, doc.getDocId(), weights, doc_length);
+        indexer.indexToken(doc.getDocId(), weights, doc_length);
         //System.out.println(doc.getDocId());
-
+        
+        doc = null;
+        indexer = null;
+        tokenizer = null;
+        tokens = null;
+        counts = null;
+        weights = null;
     }
-    
+    /*
     public void writeIndex(){
         ObjectOutputStream oos = null;
         try {
@@ -96,6 +91,6 @@ public class TI_Worker extends Thread{
                 Logger.getLogger(TI_Worker.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-    }
+    }*/
     
 }

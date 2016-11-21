@@ -15,19 +15,18 @@ import org.tartarus.snowball.ext.englishStemmer;
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class Tokenizer {
-    private Pattern pattern = Pattern.compile("\\W");
-    private Pattern space_char = Pattern.compile("\\s+");
-    private Pattern as_space = Pattern.compile("[-()]");
+    private final Pattern pattern = Pattern.compile("\\W");
+    private final Pattern space_char = Pattern.compile("\\s+|[-()\\.]");
+    private final Pattern as_space = Pattern.compile("[-()]");
     
-    private ArrayList<String> tokens = new ArrayList<>();
+    private final ArrayList<String> tokens;
     String [] stopWordsList;
-    englishStemmer stemmer = new englishStemmer();
+    englishStemmer stemmer;
     
-    public Tokenizer(String [] stopWordsList, Pattern pattern, Pattern space_char, Pattern as_space){
+    public Tokenizer(String [] stopWordsList){
         this.stopWordsList = stopWordsList;
-        this.pattern = pattern;
-        this.space_char = space_char;
-        this.as_space = as_space;
+        this.stemmer = new englishStemmer();
+        this.tokens = new ArrayList<>();
     }
     
     public String[] tokenize(String content){

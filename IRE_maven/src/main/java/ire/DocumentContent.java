@@ -10,14 +10,15 @@ package ire;
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class DocumentContent {
+    static int id = 0;
 
     int docId;
     
     String content;
     
-    public DocumentContent(String content, int docId){
+    public DocumentContent(String content){
         this.content = content;
-        this.docId = docId;
+        this.docId = getID();
     }
 
     public String getContent() {
@@ -26,5 +27,9 @@ public class DocumentContent {
 
     public int getDocId() {
         return docId;
+    }
+    
+    private static synchronized int getID(){
+        return Document.id++;
     }
 }

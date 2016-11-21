@@ -28,7 +28,7 @@ public class CsvProcessor implements Processor{
     
     private final Buffer buffer;
     
-    private final static Pattern PATTERN = Pattern.compile("(?s)<code>.*?</code>|(?s)<CODE>.*?</CODE>|<(.)*?>");
+    private final static Pattern PATTERN = Pattern.compile("(?s)<code>.*?</code>|(?s)<CODE>.*?</CODE>|<(.)*?>|\\\\S+://\\\\S+");
     
     public CsvProcessor(Buffer b){
         this.buffer = b;
@@ -71,10 +71,10 @@ public class CsvProcessor implements Processor{
                 current = currentDoc.toString();              
                 current = parseTags(current);
 
-                doc = new Document(file.getPath(), Integer.parseInt(csvRecord.get(0)));
-                documents.add(doc);
+                //doc = new Document(file.getPath(), Integer.parseInt(csvRecord.get(0)));
+                //documents.add(doc);
                 
-                buffer.addItem(new DocumentContent(current, doc.getDocId()));
+                buffer.addItem(new DocumentContent(current));
                 
                 currentDoc.setLength(0);
                
