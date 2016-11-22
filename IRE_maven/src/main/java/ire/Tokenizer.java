@@ -30,13 +30,11 @@ public class Tokenizer {
     
     public String[] tokenize(String content){
         
-        //content = as_space.matcher(content).replaceAll("");
         String [] words = space_char.split(content);
         String word;
         for(int i = 0; i < words.length; i++){
             word = transform(words[i]);
             if(word != null){
-                //Token tk = new Token(word, doc);
                 tokens.add(word);
             } 
         }         
@@ -46,15 +44,11 @@ public class Tokenizer {
     public String transform(String term){
         term = term.toLowerCase();
         
-        //term = term.replaceAll("\\W", "");
         term = pattern.matcher(term).replaceAll("");
         if(term.length()<2 || term.length() > 18){
             
             return null;
         }
-        /*if (StringUtils.isNumeric(term)){
-            return null;
-        }*/
               
         if(useArraysBinarySearch(stopWordsList, term)){
             return null;

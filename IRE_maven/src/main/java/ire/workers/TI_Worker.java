@@ -9,20 +9,13 @@ import ire.DocumentContent;
 import ire.Indexer;
 import ire.Tokenizer;
 import java.util.HashMap;
-import java.util.regex.Pattern;
 
 /**
  * Worker class to tokenize and index a document
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class TI_Worker extends Thread{
-    private final String basefolder = "indexes/";
-    
-    private static final Pattern pattern = Pattern.compile("\\W");
-    private static final Pattern space_char = Pattern.compile("\\s+");
-    private static final Pattern as_space = Pattern.compile("[-()]");
-    
-    
+
     private DocumentContent doc;
     private Indexer indexer;
     private Tokenizer tokenizer;
@@ -64,13 +57,10 @@ public class TI_Worker extends Thread{
 
         
         indexer.indexToken(doc.getDocId(), weights, doc_length);
-        //System.out.println(doc.getDocId());
         
-        if(doc.getDocId()%10000 == 0){
+        /*if(doc.getDocId()%10000 == 0){
             System.out.println(doc.getDocId());
-            //IW_Worker iw = new IW_Worker();
-            //iw.start();
-        }
+        }*/
         
         doc = null;
         indexer = null;
@@ -79,24 +69,4 @@ public class TI_Worker extends Thread{
         counts = null;
         weights = null;
     }
-    /*
-    public void writeIndex(){
-        ObjectOutputStream oos = null;
-        try {
-            String filename = basefolder + this.getId() + "_" + indexCount;
-            oos = new ObjectOutputStream(new FileOutputStream(filename));
-            oos.writeObject(indexer.getIndex());
-            oos.close();
-            indexCount++;
-        } catch (IOException ex) {
-            Logger.getLogger(TI_Worker.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                oos.close();
-            } catch (IOException ex) {
-                Logger.getLogger(TI_Worker.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }*/
-    
 }
