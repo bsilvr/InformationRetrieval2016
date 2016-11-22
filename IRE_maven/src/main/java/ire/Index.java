@@ -5,12 +5,16 @@
  */
 package ire;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.nustaq.serialization.FSTObjectOutput;
 
 public class Index implements Serializable{
     private final String basefolder = "indexes/";
@@ -83,28 +87,26 @@ public class Index implements Serializable{
     }
     
     public synchronized void writeIndex(){
-        // Write to file
-        System.err.println("Current Words Size: " + words.size());
-        System.out.println("Writing....");
-        ObjectOutputStream oos = null;
         try {
+            // Write to file
+            System.err.println("Current Words Size: " + words.size());
+            System.out.println("Writing....");
+            
             String filename = basefolder + "index_" + indexCount;
             indexCount++;
-            oos = new ObjectOutputStream(new FileOutputStream(filename));
-            oos.writeObject(dict);
-            oos.close();
+            
+            FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename));
+            out.writeObject(dict);
+            out.close(); // required !
+            
+            // Create new
+            
+            dict = new HashMap<>();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-        } finally {
-            try {
-                oos.close();
-            } catch (IOException ex) {
-            }
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        // Create new
-        dict = null;
-        System.gc();
-        dict = new HashMap<>();
     }
     
 }

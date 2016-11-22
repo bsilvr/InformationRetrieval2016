@@ -31,7 +31,7 @@ public class Indexer {
         //if(docId%100000 ==0){
             //System.out.println(docId);
         //}
-        if (docId%400000==0 && docId != 0){
+        if (docId%100000==0 && docId != 0){
             index.writeIndex();
         }
     }
