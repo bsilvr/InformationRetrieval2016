@@ -88,6 +88,14 @@ public class IRE {
             Logger.getLogger(IRE.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+        
+        endTime = System.currentTimeMillis();
+        totalTime = (endTime - startTime)/1000;
+        System.out.println("Finished Indexing: "+totalTime+" seconds.");
+        
+        Indexer indexer = new Indexer();
+        indexer.mergeIndex();
+        
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime)/1000;
         System.out.println("Finished Indexing: "+totalTime+" seconds.");
