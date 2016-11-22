@@ -15,14 +15,18 @@ public class Indexer {
     
     private static Index index = new Index();
     private int writeThreshold;
+    private static Runtime runtime = Runtime.getRuntime();
+    private static int mb = 1024*1024;
     
     
     public Indexer(){
-        writeThreshold=100000;
+        writeThreshold = ((int)(runtime.maxMemory()/mb))*100;
+        System.out.println(writeThreshold);
         
     }
     
     public Indexer(int threshold){
+        
         writeThreshold = threshold;
     }
     
@@ -31,7 +35,11 @@ public class Indexer {
             index.addTerm(entry.getKey(), docId, weight.get(entry.getKey())/doc_weight);
         }
 
-        if (docId % writeThreshold == 0 && docId != 0){
+        if ((docId % writeThreshold == 0 && docId != 0) ){
+            
+            System.out.println("Free Memory:" 
+                    + runtime.freeMemory() / mb);
+		
             index.writeIndex();
         }
     }
