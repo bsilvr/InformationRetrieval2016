@@ -10,7 +10,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +29,7 @@ public class Index implements Serializable{
     private int termID;
     
     HashMap<Integer, HashMap<Integer,Double>> dict;
-    final BidiMap<String, Integer> words;
+    private BidiMap<String, Integer> words;
     private HashMap<Integer,Double> posts;
     private HashMap<Integer, HashMap<Integer,Double>>[] alphabeticIndex;
     // words passar a dar a key para o outro hashmap
@@ -102,7 +101,7 @@ public class Index implements Serializable{
             indexCount++;
             
             FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename));
-            out.writeObject(dict);
+            out.writeObject(dict, HashMap.class);
             out.close(); // required !
             
             // Create new
@@ -115,21 +114,43 @@ public class Index implements Serializable{
         }
     }
     
+    public synchronized void writeWords(){
+        try {
+            String filename = basefolder + "words";
+            
+            FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename));
+            out.writeObject(words);
+            out.close(); // required !
+
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     public void mergeIndex(){
-        alphabeticIndex = new HashMap[27];
         ArrayList<String> files = readDir();
+        writeMergeIndex();
+        
         for(String f : files){
            
             HashMap<Integer, HashMap<Integer,Double>> tmp = myreadMethod(f);
-            consumeIndexPart(tmp);
+            HashMap[] indexPart = consumeIndexPart(tmp);
+            mergeToDisk(indexPart);
+            System.err.println("Merged " + f);
+            File file = new File(basefolder+f);
+            file.delete();
         }
-        writeMergeIndex();
+        
     }
     private ArrayList<String> readDir(){
         File folder = new File(basefolder);
         ArrayList<String> files = new ArrayList<>();
         for (final File fileEntry : folder.listFiles()) {
-        
+            if(fileEntry.getName().equals(".DS_Store") || fileEntry.getName().equals("words")){
+                continue;
+            }
             files.add(fileEntry.getName());
         }
         return files;
@@ -139,55 +160,97 @@ public class Index implements Serializable{
         if (character < 97 || character > 122){
             return 26;
         }
-        return Character.getNumericValue(character)-97;
+        return (int)character-97;
     }
     
     private HashMap<Integer, HashMap<Integer,Double>> myreadMethod(String filename){
         HashMap<Integer, HashMap<Integer,Double>> result = null;
         try {
             FSTObjectInput in = new FSTObjectInput(new FileInputStream(basefolder + filename));
-            result = (HashMap<Integer, HashMap<Integer,Double>>)in.readObject();
+            Object res = in.readObject(HashMap.class);
+            result = (HashMap<Integer, HashMap<Integer,Double>>) res;
+            
+            
             in.close(); // required !
             
         } catch (IOException ex) {
             Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
         }
         return result;
     }
     
-    private void consumeIndexPart(HashMap<Integer, HashMap<Integer,Double>> map){
+    private HashMap[] consumeIndexPart(HashMap<Integer, HashMap<Integer,Double>> map){
+        alphabeticIndex = new HashMap[27];
         for(HashMap.Entry<Integer, HashMap<Integer,Double>> entry : map.entrySet()){ 
             String word = words.getKey(entry.getKey());
+            
             int idx = getAlphabeticOrder(word.charAt(0));
             if(alphabeticIndex[idx] == null){
                 alphabeticIndex[idx] =  new HashMap<>();
             } 
-            if (alphabeticIndex[idx].containsKey(entry.getKey())){
-                alphabeticIndex[idx].get(entry.getKey()).putAll(entry.getValue());
+
+            alphabeticIndex[idx].put(entry.getKey(), entry.getValue());
+        }
+        return alphabeticIndex;
+    }
+    
+    private void mergeToDisk(HashMap[] indexes){
+        int count = 97;
+        try {
+            // Write to file
+            for(HashMap<Integer, HashMap<Integer,Double>> entry : indexes){
+                if(count==123){
+                    count =35;
+                }
+                String filename = basefolder + "final_index_" + (char)count;
+                
+                FSTObjectInput in = new FSTObjectInput(new FileInputStream(filename));
+                HashMap<Integer, HashMap<Integer,Double>> letter = (HashMap)in.readObject();
+                in.close(); // required !
+                
+                for(HashMap.Entry<Integer, HashMap<Integer,Double>> e : entry.entrySet()){
+                    if(letter == null){ 
+                    letter =  new HashMap<>(); 
+                    }  
+                    if (letter.containsKey(e.getKey())){ 
+                        letter.get(e.getKey()).putAll(e.getValue()); 
+                    } 
+                    else{ 
+                        letter.put(e.getKey(), e.getValue()); 
+                    }
+                }
+
+                FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename));
+                out.writeObject(letter);
+                out.close(); // required !
+                count++;
             }
-            else{
-                alphabeticIndex[idx].put(entry.getKey(), entry.getValue());
-            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException | ClassNotFoundException ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
     private void writeMergeIndex(){
+        alphabeticIndex = new HashMap[27];
         int count = 97;
         try {
             // Write to file
             for(HashMap<Integer, HashMap<Integer,Double>> entry : alphabeticIndex){
-                
-            
-                System.out.println("Writing final index....");
+         
                 if(count==123){
                     count =35;
                 }
                 String filename = basefolder + "final_index_" + (char)count;
 
                 FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename));
-                out.writeObject(alphabeticIndex);
+                entry = new HashMap<>();
+                out.writeObject(entry);
                 out.close(); // required !
                 count++;
             }
@@ -199,5 +262,26 @@ public class Index implements Serializable{
         
     }
     
+    public void loadWords(){
+        HashMap<Integer, HashMap<Integer,Double>> result = null;
+        try {
+            FSTObjectInput in = new FSTObjectInput(new FileInputStream(basefolder + "words"));
+            words = (BidiMap<String, Integer>)in.readObject();
+            in.close(); // required !
+            
+        } catch (IOException ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    
+    public void dumpWords(){
+        for(HashMap.Entry<String, Integer> entry : words.entrySet()){
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
+        
+    }
     
 }

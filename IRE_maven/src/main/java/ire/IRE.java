@@ -5,7 +5,6 @@
  */
 package ire;
 
-import ire.DocumentProcessors.ArffProcessor;
 import ire.workers.DP_Worker;
 import ire.workers.TI_Manager;
 import java.io.BufferedReader;
@@ -56,7 +55,6 @@ public class IRE {
                 stopWordsList.add(line);
             }
         } catch (IOException ex) {
-            Logger.getLogger(ArffProcessor.class.getName()).log(Level.SEVERE, null, ex);
         }
         String[] stopWordsArray = stopWordsList.toArray(new String[0]);
         

@@ -38,10 +38,21 @@ public class Indexer {
     
     public void writeLast(){
         index.writeIndex();
+        index.writeWords();
     }
     
     public void mergeIndex(){
         index.mergeIndex();
+        
+    }
+    
+    public void loadWords(){
+        index.loadWords();
+        
+    }
+    
+    public void dumpWords(){
+        index.dumpWords();
         
     }
     
