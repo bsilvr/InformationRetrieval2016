@@ -8,7 +8,6 @@ package ire;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
 import org.tartarus.snowball.ext.englishStemmer;
 
 /**
@@ -53,9 +52,9 @@ public class Tokenizer {
             
             return null;
         }
-        if (StringUtils.isNumeric(term)){
+        /*if (StringUtils.isNumeric(term)){
             return null;
-        }
+        }*/
               
         if(useArraysBinarySearch(stopWordsList, term)){
             return null;
