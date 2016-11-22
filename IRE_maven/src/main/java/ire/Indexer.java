@@ -12,31 +12,37 @@ import java.util.HashMap;
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class Indexer {
-    private String index_path;
     
     private static Index index = new Index();
+    private int writeThreshold;
+    
     
     public Indexer(){
-        index_path = "index.txt";
+        writeThreshold=100000;
+        
     }
     
-    public Indexer(String path){
-        index_path = path;
+    public Indexer(int threshold){
+        writeThreshold = threshold;
     }
     
     public void indexToken(int docId, HashMap<String,Double> weight, double doc_weight){
         for(HashMap.Entry<String, Double> entry : weight.entrySet()){
             index.addTerm(entry.getKey(), docId, weight.get(entry.getKey())/doc_weight);
         }
-        //if(docId%100000 ==0){
-            //System.out.println(docId);
-        //}
-        if (docId%100000==0 && docId != 0){
+
+        if (docId % writeThreshold == 0 && docId != 0){
             index.writeIndex();
         }
     }
     
-    public Index getIndex(){
-        return index;
+    public void writeLast(){
+        index.writeIndex();
     }
+    
+    public void mergeIndex(){
+        index.mergeIndex();
+        
+    }
+    
 }

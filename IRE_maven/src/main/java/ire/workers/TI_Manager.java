@@ -50,6 +50,7 @@ public class TI_Manager extends Thread{
                 buf = docProc.getNextDocument();
             }
             if (buf == null){
+                
                 break;
             }
             for(int i = 0; i < nthreads; i++){
@@ -64,6 +65,7 @@ public class TI_Manager extends Thread{
             //System.out.println(Thread.activeCount());
         }
         System.out.println("Manageer out");
+        indexer.writeLast();
     }
     
 }
