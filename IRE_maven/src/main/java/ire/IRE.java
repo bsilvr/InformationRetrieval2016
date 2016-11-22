@@ -8,7 +8,6 @@ package ire;
 import ire.DocumentProcessors.ArffProcessor;
 import ire.workers.DP_Worker;
 import ire.workers.TI_Manager;
-import ire.workers.TI_Worker;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -29,6 +28,7 @@ public class IRE {
     public static void main(String[] args) {
         // configurações
         int nthreads_dp = 1;
+        int nthreads_ti = 100;
         
         String dir = "stacksample";
         String stopWordsFile = "stopwords_en.txt";
@@ -71,7 +71,7 @@ public class IRE {
             thread_pool_dp[i].start();
         }
         
-        TI_Manager timnger = new TI_Manager(docProc, stopWordsArray);
+        TI_Manager timnger = new TI_Manager(nthreads_ti, docProc, stopWordsArray);
         timnger.start();
 
         for(int i = 0; i < nthreads_dp; i++){
@@ -88,12 +88,9 @@ public class IRE {
             Logger.getLogger(IRE.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        System.out.println(Thread.activeCount());
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime)/1000;
         System.out.println("Finished Indexing: "+totalTime+" seconds.");
-        Indexer last = new Indexer();
-        System.out.println(last.getIndex().dict.get(18));
     }
     
 }

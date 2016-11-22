@@ -66,6 +66,12 @@ public class TI_Worker extends Thread{
         indexer.indexToken(doc.getDocId(), weights, doc_length);
         //System.out.println(doc.getDocId());
         
+        if(doc.getDocId()%10000 == 0){
+            System.out.println(doc.getDocId());
+            //IW_Worker iw = new IW_Worker();
+            //iw.start();
+        }
+        
         doc = null;
         indexer = null;
         tokenizer = null;

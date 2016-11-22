@@ -8,7 +8,6 @@ package ire.workers;
 import ire.DocumentContent;
 import ire.DocumentProcessor;
 import ire.Indexer;
-import ire.Tokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,18 +15,20 @@ import java.util.logging.Logger;
  *
  * @author bernardo
  */
-public class TI_Manager  extends Thread{
-    String[] stopWordsArray;
-    DocumentContent buf;
-    TI_Worker thrd;
-    DocumentProcessor docProc;
-    Tokenizer tokenizer;
-    Indexer indexer;
+public class TI_Manager extends Thread{
+    private final String[] stopWordsArray;
+    private final DocumentProcessor docProc;
+    private final Indexer indexer;
+    private final int nthreads;
+    
+    private DocumentContent buf;
+
    
-    public TI_Manager(DocumentProcessor docProc, String[] stopWordsArray){
+    public TI_Manager(int nthreads, DocumentProcessor docProc, String[] stopWordsArray){
         this.docProc = docProc;
         this.stopWordsArray = stopWordsArray;
         this.indexer = new Indexer();
+        this.nthreads = nthreads;
     }
     
     @Override
@@ -37,10 +38,10 @@ public class TI_Manager  extends Thread{
         } catch (InterruptedException ex) {
             Logger.getLogger(TI_Manager.class.getName()).log(Level.SEVERE, null, ex);
         }
-        TI_Worker[] thread_pool = new TI_Worker[100];
+        TI_Worker[] thread_pool = new TI_Worker[nthreads];
         buf = docProc.getNextDocument();
         while(buf != null){
-            for(int i = 0; i < 100; i++){
+            for(int i = 0; i < nthreads; i++){
                 if (buf == null){
                     break;
                 }
@@ -48,7 +49,10 @@ public class TI_Manager  extends Thread{
                 thread_pool[i].start();
                 buf = docProc.getNextDocument();
             }
-            for(int i = 0; i < 100; i++){
+            if (buf == null){
+                break;
+            }
+            for(int i = 0; i < nthreads; i++){
                 try {
                     thread_pool[i].join();
                 } catch (InterruptedException ex) {

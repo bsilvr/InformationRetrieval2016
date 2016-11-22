@@ -8,6 +8,7 @@ package ire;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 import org.tartarus.snowball.ext.englishStemmer;
 
 /**
@@ -16,8 +17,7 @@ import org.tartarus.snowball.ext.englishStemmer;
  */
 public class Tokenizer {
     private final Pattern pattern = Pattern.compile("\\W");
-    private final Pattern space_char = Pattern.compile("\\s+|[-()\\.]");
-    private final Pattern as_space = Pattern.compile("[-()]");
+    private final Pattern space_char = Pattern.compile("\\s+|[-()\\./_]");
     
     private final ArrayList<String> tokens;
     String [] stopWordsList;
@@ -31,7 +31,7 @@ public class Tokenizer {
     
     public String[] tokenize(String content){
         
-        content = as_space.matcher(content).replaceAll("");
+        //content = as_space.matcher(content).replaceAll("");
         String [] words = space_char.split(content);
         String word;
         for(int i = 0; i < words.length; i++){
@@ -49,10 +49,14 @@ public class Tokenizer {
         
         //term = term.replaceAll("\\W", "");
         term = pattern.matcher(term).replaceAll("");
-        if(term.length()<2){
+        if(term.length()<2 || term.length() > 18){
+            
             return null;
         }
-        
+        if (StringUtils.isNumeric(term)){
+            return null;
+        }
+              
         if(useArraysBinarySearch(stopWordsList, term)){
             return null;
         }

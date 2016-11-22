@@ -28,7 +28,7 @@ public class CsvProcessor implements Processor{
     
     private final Buffer buffer;
     
-    private final static Pattern PATTERN = Pattern.compile("(?s)<code>.*?</code>|(?s)<CODE>.*?</CODE>|<(.)*?>|\\\\S+://\\\\S+");
+    private final static Pattern PATTERN = Pattern.compile("(?s)<code>.*?</code>|(?s)<CODE>.*?</CODE>|<(.)*?>|(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
     
     public CsvProcessor(Buffer b){
         this.buffer = b;
@@ -57,6 +57,7 @@ public class CsvProcessor implements Processor{
                     firstTime = false;
                     currentDoc.append(csvRecord.get(5));
                     try{ 
+                        currentDoc.append(" ");
                         currentDoc.append(csvRecord.get(6));
                     }catch(ArrayIndexOutOfBoundsException e) {
                         title = false;
@@ -65,6 +66,7 @@ public class CsvProcessor implements Processor{
                 }else{
                     currentDoc.append(csvRecord.get(5));
                     if(title){
+                        currentDoc.append(" ");
                         currentDoc.append(csvRecord.get(6));
                     }
                 }

@@ -39,6 +39,7 @@ public class Index implements Serializable{
             termID = words.get(term);
         }
         else{
+            //System.out.println(term);
             words.put(term, countID);
             termID = countID;
             countID++;

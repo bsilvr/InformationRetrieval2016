@@ -29,7 +29,7 @@ public class Indexer {
             index.addTerm(entry.getKey(), docId, weight.get(entry.getKey())/doc_weight);
         }
         //if(docId%100000 ==0){
-            System.out.println(docId);
+            //System.out.println(docId);
         //}
         if (docId%400000==0 && docId != 0){
             index.writeIndex();
