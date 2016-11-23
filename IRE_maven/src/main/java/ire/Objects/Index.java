@@ -125,6 +125,7 @@ public class Index implements Serializable{
     }
     
     public synchronized void writeWords(){
+        System.out.println(words.size());
         try {
             String filename = basefolder + "/other/words";
             
@@ -144,16 +145,13 @@ public class Index implements Serializable{
         writeMergeIndex();
         
         for(String f : files){
-            HashMap<Integer, HashMap<Integer,Double>> tmp = readObject("/tmp/" + f);
-            HashMap[] indexPart = consumeIndexPart(tmp);
-            mergeToDisk(indexPart);
+            mergeToDisk(consumeIndexPart(readObject("/tmp/" + f)));
             if (debug){
                 System.err.println("Merged " + f);
             }
-            File file = new File(basefolder + "/tmp/" + f);
-            file.delete();
-        }
-        
+            new File(basefolder + "/tmp/" + f).delete();
+            System.gc();
+        } 
     }
     
     public void loadWords(){
@@ -182,6 +180,7 @@ public class Index implements Serializable{
             }
             files.add(fileEntry.getName());
         }
+        folder = null;
         return files;
     }
     
@@ -193,13 +192,11 @@ public class Index implements Serializable{
     }
     
     private HashMap<Integer, HashMap<Integer,Double>> readObject(String filename){
-        HashMap<Integer, HashMap<Integer,Double>> result = null;
         try {
             FSTObjectInput in = new FSTObjectInput(new FileInputStream(basefolder + filename));
             Object res = in.readObject(HashMap.class);
-            result = (HashMap<Integer, HashMap<Integer,Double>>) res;
             in.close();
-            
+            return (HashMap<Integer, HashMap<Integer,Double>>) res;
         } catch (IOException ex) {
             Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
@@ -207,13 +204,14 @@ public class Index implements Serializable{
         } catch (Exception ex) {
             Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return result;
+        return null;
     }
     
     private HashMap[] consumeIndexPart(HashMap<Integer, HashMap<Integer,Double>> map){
         HashMap<Integer, HashMap<Integer,Double>>[] alphabeticIndex = new HashMap[27];
+        String word;
         for(HashMap.Entry<Integer, HashMap<Integer,Double>> entry : map.entrySet()){ 
-            String word = words.getKey(entry.getKey());
+            word = words.getKey(entry.getKey());
             
             int idx = getAlphabeticOrder(word.charAt(0));
             if(alphabeticIndex[idx] == null){
@@ -228,14 +226,17 @@ public class Index implements Serializable{
     private void mergeToDisk(HashMap[] indexes){
         int count = 97;
         try {
+            FSTObjectInput in;
+            FSTObjectOutput out;
+            HashMap<Integer, HashMap<Integer,Double>> letter;
             for(HashMap<Integer, HashMap<Integer,Double>> entry : indexes){
                 if(count==123){
                     count =35;
                 }
                 String filename = basefolder + "/final_index_" + (char)count;
                 
-                FSTObjectInput in = new FSTObjectInput(new FileInputStream(filename));
-                HashMap<Integer, HashMap<Integer,Double>> letter = (HashMap)in.readObject();
+                in = new FSTObjectInput(new FileInputStream(filename));
+                letter = (HashMap)in.readObject();
                 in.close();
                 
                 for(HashMap.Entry<Integer, HashMap<Integer,Double>> e : entry.entrySet()){
@@ -250,11 +251,15 @@ public class Index implements Serializable{
                     }
                 }
 
-                FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename));
+                out = new FSTObjectOutput(new FileOutputStream(filename));
                 out.writeObject(letter);
                 out.close();
                 count++;
+                System.gc();
             }
+            in = null;
+            out = null;
+            letter = null;
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException | ClassNotFoundException ex) {
@@ -263,22 +268,24 @@ public class Index implements Serializable{
     }
     
     private void writeMergeIndex(){
-        HashMap<Integer, HashMap<Integer,Double>>[] alphabeticIndex = new HashMap[27];
+        HashMap<Integer, HashMap<Integer,Double>> alphabeticIndex = new HashMap<>();
         int count = 97;
         try {
-            for(HashMap<Integer, HashMap<Integer,Double>> entry : alphabeticIndex){
+            FSTObjectOutput out;
+            for(int i = 0; i < 27; i++){
          
                 if(count == 123){
                     count = 35;
                 }
                 String filename = basefolder + "/final_index_" + (char)count;
 
-                FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename));
-                entry = new HashMap<>();
-                out.writeObject(entry);
+                out = new FSTObjectOutput(new FileOutputStream(filename));
+                out.writeObject(alphabeticIndex);
                 out.close();
                 count++;
             }
+            out = null;
+            alphabeticIndex = null;
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
