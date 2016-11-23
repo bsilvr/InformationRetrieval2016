@@ -17,6 +17,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.nustaq.serialization.FSTObjectInput;
 import org.nustaq.serialization.FSTObjectOutput;
 
@@ -25,25 +27,31 @@ import org.nustaq.serialization.FSTObjectOutput;
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class Index implements Serializable{
+    private static int fileID = 0;
     private final String basefolder;
     
     private int indexCount = 0;
     private int countID = 0;
     private int termID;
     
+    private HashMap<String,Integer> filesMapping;
+    private BidiMap<Integer, Pair<Integer,Integer>> documents;
     private HashMap<Integer, HashMap<Integer,Double>> dict;
     private BidiMap<String, Integer> words;
     private HashMap<Integer,Double> posts;
     private HashMap<Integer, HashMap<Integer,Double>>[] alphabeticIndex;
             
     public Index(){
-
+        filesMapping = new HashMap<>();
+        documents = new DualHashBidiMap();
         dict = new HashMap<>();
         words = new DualHashBidiMap();
         basefolder = "indexes/";
     }
     
     public Index(String bf){
+        filesMapping = new HashMap<>();
+        documents = new DualHashBidiMap();
         dict = new HashMap<>();
         words = new DualHashBidiMap();
         basefolder = bf;
@@ -69,6 +77,18 @@ public class Index implements Serializable{
             posts.put(doc, weight);
             dict.put(termID, posts);
         }
+    }
+    
+    public synchronized void addDocument(String filePath, int docID, int line){
+        int fileID;
+        if(!filesMapping.containsKey(filePath)){
+            fileID = getFileID();
+            filesMapping.put(filePath, fileID);
+        }
+        else{
+            fileID = filesMapping.get(filePath);
+        }
+        documents.put(docID, new ImmutablePair<>(fileID,line));
     }
     
     public synchronized void writeIndex(){
@@ -98,6 +118,31 @@ public class Index implements Serializable{
             
             FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename));
             out.writeObject(words);
+            out.close();
+
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public synchronized void writeDocuments(){
+        try {
+            String filename = basefolder + "documents";
+            FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename));
+            out.writeObject(documents);
+            out.close();
+
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            String filename = basefolder + "fileMap";
+            FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename));
+            out.writeObject(filesMapping);
             out.close();
 
         } catch (FileNotFoundException ex) {
@@ -145,7 +190,7 @@ public class Index implements Serializable{
         File folder = new File(basefolder);
         ArrayList<String> files = new ArrayList<>();
         for (final File fileEntry : folder.listFiles()) {
-            if(fileEntry.getName().equals(".DS_Store") || fileEntry.getName().equals("words")){
+            if(fileEntry.getName().equals(".DS_Store") || fileEntry.getName().equals("words") || fileEntry.getName().equals("documents") || fileEntry.getName().equals("fileMap")){
                 continue;
             }
             files.add(fileEntry.getName());
@@ -253,5 +298,9 @@ public class Index implements Serializable{
             Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-    }    
+    }
+    
+    private static synchronized int getFileID(){
+        return Index.fileID++;
+    }
 }

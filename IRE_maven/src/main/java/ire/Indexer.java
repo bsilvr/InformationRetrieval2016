@@ -8,7 +8,7 @@ package ire;
 import java.util.HashMap;
 
 /**
- *
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class Indexer {
@@ -18,15 +18,12 @@ public class Indexer {
     private static Runtime runtime = Runtime.getRuntime();
     private static int mb = 1024*1024;
     
-    
     public Indexer(){
         writeThreshold = ((int)(runtime.maxMemory()/mb))*100;
         System.out.println(writeThreshold);
-        
     }
     
     public Indexer(int threshold){
-        
         writeThreshold = threshold;
     }
     
@@ -44,9 +41,14 @@ public class Indexer {
         }
     }
     
+    public void addDocument(String filePath, int docid, int line){
+        index.addDocument(filePath, docid, line);
+    }
+    
     public void writeLast(){
         index.writeIndex();
         index.writeWords();
+        index.writeDocuments();
     }
     
     public void mergeIndex(){

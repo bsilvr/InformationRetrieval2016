@@ -12,19 +12,21 @@ import java.util.HashMap;
 
 /**
  * Worker class to tokenize and index a document
+ * 
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class TI_Worker extends Thread{
-
+    private boolean debug;
     private DocumentContent doc;
     private Indexer indexer;
     private Tokenizer tokenizer;
 
-    public TI_Worker(DocumentContent doc, Indexer indexer, String[] stopWordsArray){
+    public TI_Worker(DocumentContent doc, Indexer indexer, String[] stopWordsArray, boolean debug){
         this.doc = doc;
         this.indexer = indexer;
         this.tokenizer = new Tokenizer(stopWordsArray);
-
+        this.debug = debug;
     }
 
     @Override
@@ -57,10 +59,14 @@ public class TI_Worker extends Thread{
 
         
         indexer.indexToken(doc.getDocId(), weights, doc_length);
+        indexer.addDocument(doc.getFilePath(), doc.getDocId(), doc.getStartLine());
         
-        /*if(doc.getDocId()%10000 == 0){
-            System.out.println(doc.getDocId());
-        }*/
+        if(debug){
+            if(doc.getDocId()%10000 == 0){
+                System.out.println(doc.getDocId());
+            }
+        }
+        
         
         doc = null;
         indexer = null;

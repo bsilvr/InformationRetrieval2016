@@ -46,6 +46,8 @@ public class IRE {
         // Extensions to ignore when reading dir
         String [] ignoreExtensions = {".pdf", ".docx", ".txt"};
         
+        // Enable or disable debug mode (prints more info)
+        boolean debug = false;
         
         // String documentMappingPath = "";
         
@@ -107,7 +109,7 @@ public class IRE {
             thread_pool_dp[i].start();
         }
         
-        TI_Manager timnger = new TI_Manager(nthreads_ti, docProc, stopWordsArray);
+        TI_Manager timnger = new TI_Manager(nthreads_ti, docProc, stopWordsArray, debug);
         timnger.start();
 
         for(int i = 0; i < nthreads_dp; i++){

@@ -33,7 +33,7 @@ public class DocumentContent {
     }
     
     private static synchronized int getID(){
-        return Document.id++;
+        return DocumentContent.id++;
     }
 
     /**
