@@ -17,18 +17,24 @@ import java.util.logging.Logger;
  */
 public class TI_Manager extends Thread{
     private boolean debug;
+    private boolean stemming;
+    private boolean stopWords;
+    private boolean bolleanIndex;
     private final String[] stopWordsArray;
     private final DocumentProcessor docProc;
     private final Indexer indexer;
     private final int nthreads;
     private DocumentContent buf;
 
-    public TI_Manager(int nthreads, DocumentProcessor docProc, String[] stopWordsArray, boolean debug, String indexBaseFolder){
+    public TI_Manager(int nthreads, DocumentProcessor docProc, String[] stopWordsArray, boolean debug, String indexBaseFolder, boolean stemming, boolean stopWords, boolean bolleanIndex){
         this.docProc = docProc;
         this.stopWordsArray = stopWordsArray;
         this.indexer = new Indexer(indexBaseFolder, debug);
         this.nthreads = nthreads;
         this.debug = debug;
+        this.stemming = stemming;
+        this.stopWords = stopWords;
+        this.bolleanIndex = bolleanIndex;
     }
     
     @Override
@@ -41,7 +47,7 @@ public class TI_Manager extends Thread{
                 if (buf == null){
                     break;
                 }
-                thread_pool[i] = new TI_Worker(buf, indexer, stopWordsArray, debug);
+                thread_pool[i] = new TI_Worker(buf, indexer, stopWordsArray, debug, stemming, stopWords, bolleanIndex);
                 thread_pool[i].start();
                 buf = docProc.getNextDocument();
             }
