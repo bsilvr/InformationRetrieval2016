@@ -7,13 +7,15 @@ package ire;
 
 import ire.DocumentProcessors.CsvProcessor;
 import ire.DocumentProcessors.Processor;
+import ire.Objects.Buffer;
+import ire.Objects.CorpusFile;
+import ire.Objects.DocumentContent;
 
 /**
  * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class DocumentProcessor {
-
     private Processor proc;
     private Buffer buffer;
     

@@ -11,21 +11,42 @@ import java.util.regex.Pattern;
 import org.tartarus.snowball.ext.englishStemmer;
 
 /**
- *
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class Tokenizer {
     private final Pattern pattern = Pattern.compile("\\W");
     private final Pattern space_char = Pattern.compile("\\s+|[-()\\./_]");
-    
+    private boolean stemming;
+    private boolean removeStopWords;
+    private boolean debug;
     private final ArrayList<String> tokens;
     String [] stopWordsList;
     englishStemmer stemmer;
     
-    public Tokenizer(String [] stopWordsList){
+    public Tokenizer(String [] stopWordsList, boolean stemming, boolean removeStopWords, boolean debug){
         this.stopWordsList = stopWordsList;
         this.stemmer = new englishStemmer();
         this.tokens = new ArrayList<>();
+        this.debug = debug;
+        this.stemming = stemming;
+        this.removeStopWords = removeStopWords;
+    }
+    public Tokenizer(String [] stopWordsList, boolean stemming, boolean removeStopWords){
+        this.stopWordsList = stopWordsList;
+        this.stemmer = new englishStemmer();
+        this.tokens = new ArrayList<>();
+        this.debug = false;
+        this.stemming = stemming;
+        this.removeStopWords = removeStopWords;
+    }
+    public Tokenizer(String [] stopWordsList, boolean debug){
+        this.stopWordsList = stopWordsList;
+        this.stemmer = new englishStemmer();
+        this.tokens = new ArrayList<>();
+        this.debug = debug;
+        this.stemming = true;
+        this.removeStopWords = true;
     }
     
     public String[] tokenize(String content){
@@ -46,18 +67,20 @@ public class Tokenizer {
         
         term = pattern.matcher(term).replaceAll("");
         if(term.length()<2 || term.length() > 18){
-            
             return null;
         }
-              
-        if(useArraysBinarySearch(stopWordsList, term)){
-            return null;
+        
+        if(removeStopWords){
+            if(useArraysBinarySearch(stopWordsList, term)){
+                return null;
+            }
         }
-
-        // Stemming
-        stemmer.setCurrent(term);
-        if (stemmer.stem()){
-            return stemmer.getCurrent();
+        
+        if(stemming){
+            stemmer.setCurrent(term);
+            if (stemmer.stem()){
+                return stemmer.getCurrent();
+            }
         }
         
         return term;

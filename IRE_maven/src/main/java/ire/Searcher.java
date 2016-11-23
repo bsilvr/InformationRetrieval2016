@@ -5,6 +5,8 @@
  */
 package ire;
 
+import ire.Objects.Index;
+
 /**
  *
  * @author Bruno Silva <brunomiguelsilva@ua.pt>

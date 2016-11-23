@@ -5,9 +5,9 @@
  */
 package ire.workers;
 
-import ire.DocumentContent;
 import ire.DocumentProcessor;
 import ire.Indexer;
+import ire.Objects.DocumentContent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,10 +23,10 @@ public class TI_Manager extends Thread{
     private final int nthreads;
     private DocumentContent buf;
 
-    public TI_Manager(int nthreads, DocumentProcessor docProc, String[] stopWordsArray, boolean debug){
+    public TI_Manager(int nthreads, DocumentProcessor docProc, String[] stopWordsArray, boolean debug, String indexBaseFolder){
         this.docProc = docProc;
         this.stopWordsArray = stopWordsArray;
-        this.indexer = new Indexer();
+        this.indexer = new Indexer(indexBaseFolder, debug);
         this.nthreads = nthreads;
         this.debug = debug;
     }
@@ -57,7 +57,9 @@ public class TI_Manager extends Thread{
                 thread_pool[i] = null;
             }
         }
-        System.out.println("Manager has Finished...");
+        if(debug){
+            System.out.println("Manager has Finished execution...");
+        }
         indexer.writeLast();
     }
     

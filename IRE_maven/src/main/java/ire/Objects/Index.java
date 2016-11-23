@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ire;
+package ire.Objects;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,7 +29,7 @@ import org.nustaq.serialization.FSTObjectOutput;
 public class Index implements Serializable{
     private static int fileID = 0;
     private final String basefolder;
-    
+    private boolean debug;
     private int indexCount = 0;
     private int countID = 0;
     private int termID;
@@ -46,7 +46,17 @@ public class Index implements Serializable{
         documents = new DualHashBidiMap();
         dict = new HashMap<>();
         words = new DualHashBidiMap();
-        basefolder = "indexes/";
+        basefolder = "indexes";
+        debug = false;
+    }
+    
+    public Index(String bf, boolean debug){
+        filesMapping = new HashMap<>();
+        documents = new DualHashBidiMap();
+        dict = new HashMap<>();
+        words = new DualHashBidiMap();
+        basefolder = bf;
+        this.debug = debug;
     }
     
     public Index(String bf){
@@ -55,6 +65,16 @@ public class Index implements Serializable{
         dict = new HashMap<>();
         words = new DualHashBidiMap();
         basefolder = bf;
+        this.debug = false;
+    }
+    
+    public Index(boolean debug){
+        filesMapping = new HashMap<>();
+        documents = new DualHashBidiMap();
+        dict = new HashMap<>();
+        words = new DualHashBidiMap();
+        basefolder = "indexes";
+        this.debug = debug;
     }
     
     public synchronized void addTerm(String term, int doc, double weight){
@@ -94,16 +114,18 @@ public class Index implements Serializable{
     public synchronized void writeIndex(){
         try {
             // Write to file
-            System.out.println("Writing intermediary index to disk....");
+            if(debug){
+                System.out.println("Writing intermediary index to disk....");
+            }
             
-            String filename = basefolder + "index_" + indexCount;
+            String filename = basefolder + "/tmp/index_" + indexCount;
             indexCount++;
             
             FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename));
             out.writeObject(dict, HashMap.class);
             out.close();
             
-            // Create new
+            // Create new index
             dict = new HashMap<>();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
@@ -114,7 +136,7 @@ public class Index implements Serializable{
     
     public synchronized void writeWords(){
         try {
-            String filename = basefolder + "words";
+            String filename = basefolder + "/other/words";
             
             FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename));
             out.writeObject(words);
@@ -129,7 +151,7 @@ public class Index implements Serializable{
     
     public synchronized void writeDocuments(){
         try {
-            String filename = basefolder + "documents";
+            String filename = basefolder + "/other/documents";
             FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename));
             out.writeObject(documents);
             out.close();
@@ -140,7 +162,7 @@ public class Index implements Serializable{
             Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            String filename = basefolder + "fileMap";
+            String filename = basefolder + "/other/fileMap";
             FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename));
             out.writeObject(filesMapping);
             out.close();
@@ -158,20 +180,21 @@ public class Index implements Serializable{
         
         for(String f : files){
            
-            HashMap<Integer, HashMap<Integer,Double>> tmp = myreadMethod(f);
+            HashMap<Integer, HashMap<Integer,Double>> tmp = readObject(f);
             HashMap[] indexPart = consumeIndexPart(tmp);
             mergeToDisk(indexPart);
-            System.err.println("Merged " + f);
-            File file = new File(basefolder+f);
+            if (debug){
+                System.err.println("Merged " + f);
+            }
+            File file = new File(basefolder + "/tmp/" + f);
             file.delete();
         }
         
     }
     
     public void loadWords(){
-        HashMap<Integer, HashMap<Integer,Double>> result = null;
         try {
-            FSTObjectInput in = new FSTObjectInput(new FileInputStream(basefolder + "words"));
+            FSTObjectInput in = new FSTObjectInput(new FileInputStream(basefolder + "/other/words"));
             words = (BidiMap<String, Integer>)in.readObject();
             in.close();
             
@@ -190,7 +213,7 @@ public class Index implements Serializable{
         File folder = new File(basefolder);
         ArrayList<String> files = new ArrayList<>();
         for (final File fileEntry : folder.listFiles()) {
-            if(fileEntry.getName().equals(".DS_Store") || fileEntry.getName().equals("words") || fileEntry.getName().equals("documents") || fileEntry.getName().equals("fileMap")){
+            if(fileEntry.getName().equals(".DS_Store")){
                 continue;
             }
             files.add(fileEntry.getName());
@@ -205,10 +228,10 @@ public class Index implements Serializable{
         return (int)character-97;
     }
     
-    private HashMap<Integer, HashMap<Integer,Double>> myreadMethod(String filename){
+    private HashMap<Integer, HashMap<Integer,Double>> readObject(String filename){
         HashMap<Integer, HashMap<Integer,Double>> result = null;
         try {
-            FSTObjectInput in = new FSTObjectInput(new FileInputStream(basefolder + filename));
+            FSTObjectInput in = new FSTObjectInput(new FileInputStream(basefolder + "/tmp/" + filename));
             Object res = in.readObject(HashMap.class);
             result = (HashMap<Integer, HashMap<Integer,Double>>) res;
             in.close();

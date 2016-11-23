@@ -5,6 +5,7 @@
  */
 package ire;
 
+import ire.Objects.CorpusFile;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;

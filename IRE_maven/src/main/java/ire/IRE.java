@@ -49,35 +49,44 @@ public class IRE {
         // Enable or disable debug mode (prints more info)
         boolean debug = false;
         
-        // String documentMappingPath = "";
+        // Base Folder to store indexes and other necessary data structures
+        String indexBaseFolder = "indexes";
         
         // Whether the tokenizer should stemm words or not
-        // boolean stemming = true;
+        boolean stemming = true;
         
         // Whether the tokenizer should remove stop words or not
-        // boolean removeStopWords = true;
+        boolean removeStopWords = true;
+        
+        // Boolean index - if true no weights are calculated
+        boolean bolleanIndex = false;
         
         /////////////////////////////////////////////////////////////////////////////////
         int mb = 1024*1024;
 		
-        //Getting the runtime reference from system
-        Runtime runtime = Runtime.getRuntime();
+        
+        if(debug){
+            //Getting the runtime reference from system
+            Runtime runtime = Runtime.getRuntime();
 
-        System.out.println("##### Heap utilization statistics [MB] #####");
+            System.out.println("##### Heap utilization statistics [MB] #####");
 
-        //Print used memory
-        System.out.println("Used Memory:" 
-                + (runtime.totalMemory() - runtime.freeMemory()) / mb);
+            //Print used memory
+            System.out.println("Used Memory:" 
+                    + (runtime.totalMemory() - runtime.freeMemory()) / mb);
 
-        //Print free memory
-        System.out.println("Free Memory:" 
-                + runtime.freeMemory() / mb);
+            //Print free memory
+            System.out.println("Free Memory:" 
+                    + runtime.freeMemory() / mb);
 
-        //Print total available memory
-        System.out.println("Total Memory:" + runtime.totalMemory() / mb);
+            //Print total available memory
+            System.out.println("Total Memory:" + runtime.totalMemory() / mb);
 
-        //Print Maximum available memory
-        System.out.println("Max Memory:" + runtime.maxMemory() / mb);
+            //Print Maximum available memory
+            System.out.println("Max Memory:" + runtime.maxMemory() / mb);
+            
+            // Print all settings
+        }
         
         /////////////////////////////////////////////////////////////////////////////////
         double startTime = System.currentTimeMillis();
@@ -109,7 +118,7 @@ public class IRE {
             thread_pool_dp[i].start();
         }
         
-        TI_Manager timnger = new TI_Manager(nthreads_ti, docProc, stopWordsArray, debug);
+        TI_Manager timnger = new TI_Manager(nthreads_ti, docProc, stopWordsArray, debug, indexBaseFolder);
         timnger.start();
 
         for(int i = 0; i < nthreads_dp; i++){
@@ -131,7 +140,7 @@ public class IRE {
         totalTime = (endTime - startTime)/1000;
         System.out.println("Finished Indexing: "+totalTime+" seconds.");
         
-        Indexer indexer = new Indexer();
+        Indexer indexer = new Indexer(indexBaseFolder, debug);
         indexer.mergeIndex();
         
         endTime = System.currentTimeMillis();

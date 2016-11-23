@@ -5,9 +5,9 @@
  */
 package ire.DocumentProcessors;
 
-import ire.Buffer;
-import ire.CorpusFile;
-import ire.DocumentContent;
+import ire.Objects.Buffer;
+import ire.Objects.CorpusFile;
+import ire.Objects.DocumentContent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;

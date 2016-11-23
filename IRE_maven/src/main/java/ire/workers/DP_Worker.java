@@ -5,21 +5,29 @@
  */
 package ire.workers;
 
-import ire.CorpusFile;
 import ire.CorpusReader;
 import ire.DocumentProcessor;
+import ire.Objects.CorpusFile;
 
 /**
- *
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class DP_Worker extends Thread{
-    CorpusReader corpus;
-    DocumentProcessor docProc;
+    private boolean debug;
+    private CorpusReader corpus;
+    private DocumentProcessor docProc;
+    
+    public DP_Worker(CorpusReader corpus, DocumentProcessor docProc, boolean debug){
+        this.corpus = corpus;
+        this.docProc = docProc;
+        this.debug = debug;
+    }
     
     public DP_Worker(CorpusReader corpus, DocumentProcessor docProc){
         this.corpus = corpus;
         this.docProc = docProc;
+        this.debug = false;
     }
     
     @Override
@@ -29,10 +37,13 @@ public class DP_Worker extends Thread{
         while(file != null){
             docProc.processDocument(file);
             file = corpus.getNextFile();
-            System.out.println("New Doc");
+            if(debug){
+                System.out.println("Reading document " + file.getPath());
+            }
         }
-        System.out.println("DP out");
-
+        if(debug){
+            System.out.println("Document Process thread finished...");
+        }
         docProc.setFinish();
     }
 }

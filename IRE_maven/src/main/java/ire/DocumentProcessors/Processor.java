@@ -5,11 +5,11 @@
  */
 package ire.DocumentProcessors;
 
-import ire.CorpusFile;
-import ire.DocumentContent;
+import ire.Objects.CorpusFile;
+import ire.Objects.DocumentContent;
 
 /**
- *
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public interface Processor {
