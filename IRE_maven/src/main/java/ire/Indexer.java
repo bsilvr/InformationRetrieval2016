@@ -5,6 +5,7 @@
  */
 package ire;
 
+import ire.Objects.DocumentList;
 import ire.Objects.Index;
 import java.util.HashMap;
 
@@ -15,6 +16,8 @@ import java.util.HashMap;
 public class Indexer {
     
     private static Index index;
+    private static DocumentList documents;
+    
     private int writeThreshold;
     private static Runtime runtime = Runtime.getRuntime();
     private static int mb = 1024*1024;
@@ -24,6 +27,9 @@ public class Indexer {
         if(index == null){
             index = new Index();
         }
+        if(documents == null){
+            documents = new DocumentList();
+        }
         writeThreshold = ((int)(runtime.maxMemory()/mb))*100;
         this.debug = false;
     }
@@ -31,6 +37,9 @@ public class Indexer {
     public Indexer(int threshold, boolean debug, String basefolder){
         if(index == null){
             index = new Index(basefolder, debug);
+        }
+        if(documents == null){
+            documents = new DocumentList();
         }
         writeThreshold = threshold;
         this.debug = debug;
@@ -40,6 +49,9 @@ public class Indexer {
         if(index == null){
             index = new Index(basefolder, debug);
         }
+        if(documents == null){
+            documents = new DocumentList();
+        }
         writeThreshold = ((int)(runtime.maxMemory()/mb))*100;
         this.debug = debug;
     }
@@ -48,6 +60,9 @@ public class Indexer {
         if(index == null){
             index = new Index(basefolder, false);
         }
+        if(documents == null){
+            documents = new DocumentList();
+        }
         writeThreshold = ((int)(runtime.maxMemory()/mb))*100;
         this.debug = false;
     }
@@ -55,6 +70,9 @@ public class Indexer {
     public Indexer(boolean debug){
         if(index == null){
             index = new Index(false);
+        }
+        if(documents == null){
+            documents = new DocumentList();
         }
         writeThreshold = ((int)(runtime.maxMemory()/mb))*100;
         this.debug = debug;
@@ -87,13 +105,19 @@ public class Indexer {
     }
     
     public void addDocument(String filePath, int docid, int line){
-        index.addDocument(filePath, docid, line);
+        documents.addDocument(filePath, docid, line);
+        if ((docid % writeThreshold == 0 && docid != 0) ){
+            if(debug){
+                System.out.println("Writing Documens");
+            }
+            documents.writeDocuments();
+        }
     }
     
     public void writeLast(){
         index.writeIndex();
         index.writeWords();
-        index.writeDocuments();
+        documents.writeDocuments();
     }
     
     public void mergeIndex(){

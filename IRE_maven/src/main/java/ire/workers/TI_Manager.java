@@ -39,6 +39,11 @@ public class TI_Manager extends Thread{
     
     @Override
     public void run() {
+        try {
+            sleep(1000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(TI_Manager.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         TI_Worker[] thread_pool = new TI_Worker[nthreads];
         buf = docProc.getNextDocument();

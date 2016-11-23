@@ -65,7 +65,7 @@ public class IRE {
         int mb = 1024*1024;
 		
         
-        //if(debug){
+        if(debug){
             //Getting the runtime reference from system
             Runtime runtime = Runtime.getRuntime();
 
@@ -86,7 +86,7 @@ public class IRE {
             System.out.println("Max Memory:" + runtime.maxMemory() / mb);
             
             // Print all settings
-        //}
+        }
         
         /////////////////////////////////////////////////////////////////////////////////
         double startTime = System.currentTimeMillis();
@@ -124,6 +124,7 @@ public class IRE {
         for(int i = 0; i < nthreads_dp; i++){
             try {
                 thread_pool_dp[i].join();
+                thread_pool_dp[i] = null;
             } catch (InterruptedException ex) {
                 Logger.getLogger(IRE.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -131,16 +132,22 @@ public class IRE {
         
         try {
             timnger.join();
+            timnger = null;
         } catch (InterruptedException ex) {
             Logger.getLogger(IRE.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+        corpus = null;
+        stopWordsArray = null;
+        docProc = null;
+        System.gc();
         
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime)/1000;
         System.out.println("Finished Indexing: "+totalTime+" seconds.");
         
         Indexer indexer = new Indexer(indexBaseFolder, debug);
+        indexer.loadWords();
         indexer.mergeIndex();
         
         endTime = System.currentTimeMillis();
