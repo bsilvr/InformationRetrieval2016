@@ -48,6 +48,10 @@ public class Index implements Serializable{
         words = new DualHashBidiMap();
         basefolder = "indexes";
         debug = false;
+        
+        // Create folders they dont exist
+        new File(basefolder+"/tmp").mkdirs();
+        new File(basefolder+"/other").mkdirs();
     }
     
     public Index(String bf, boolean debug){
@@ -57,6 +61,10 @@ public class Index implements Serializable{
         words = new DualHashBidiMap();
         basefolder = bf;
         this.debug = debug;
+        
+        // Create folders they dont exist
+        new File(basefolder+"/tmp").mkdirs();
+        new File(basefolder+"/other").mkdirs();
     }
     
     public Index(String bf){
@@ -66,6 +74,10 @@ public class Index implements Serializable{
         words = new DualHashBidiMap();
         basefolder = bf;
         this.debug = false;
+        
+        // Create folders they dont exist
+        new File(basefolder+"/tmp").mkdirs();
+        new File(basefolder+"/other").mkdirs();
     }
     
     public Index(boolean debug){
@@ -75,6 +87,10 @@ public class Index implements Serializable{
         words = new DualHashBidiMap();
         basefolder = "indexes";
         this.debug = debug;
+        
+        // Create folders they dont exist
+        new File(basefolder+"/tmp").mkdirs();
+        new File(basefolder+"/other").mkdirs();
     }
     
     public synchronized void addTerm(String term, int doc, double weight){
@@ -213,7 +229,7 @@ public class Index implements Serializable{
         File folder = new File(basefolder);
         ArrayList<String> files = new ArrayList<>();
         for (final File fileEntry : folder.listFiles()) {
-            if(fileEntry.getName().equals(".DS_Store")){
+            if(fileEntry.getName().equals(".DS_Store") || fileEntry.isDirectory()){
                 continue;
             }
             files.add(fileEntry.getName());
@@ -268,7 +284,7 @@ public class Index implements Serializable{
                 if(count==123){
                     count =35;
                 }
-                String filename = basefolder + "final_index_" + (char)count;
+                String filename = basefolder + "/final_index_" + (char)count;
                 
                 FSTObjectInput in = new FSTObjectInput(new FileInputStream(filename));
                 HashMap<Integer, HashMap<Integer,Double>> letter = (HashMap)in.readObject();
@@ -307,7 +323,7 @@ public class Index implements Serializable{
                 if(count == 123){
                     count = 35;
                 }
-                String filename = basefolder + "final_index_" + (char)count;
+                String filename = basefolder + "/final_index_" + (char)count;
 
                 FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename));
                 entry = new HashMap<>();

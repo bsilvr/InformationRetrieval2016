@@ -65,7 +65,7 @@ public class IRE {
         int mb = 1024*1024;
 		
         
-        if(debug){
+        //if(debug){
             //Getting the runtime reference from system
             Runtime runtime = Runtime.getRuntime();
 
@@ -86,7 +86,7 @@ public class IRE {
             System.out.println("Max Memory:" + runtime.maxMemory() / mb);
             
             // Print all settings
-        }
+        //}
         
         /////////////////////////////////////////////////////////////////////////////////
         double startTime = System.currentTimeMillis();
