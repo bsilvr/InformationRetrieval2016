@@ -10,7 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class Buffer {
@@ -54,12 +54,10 @@ public class Buffer {
         nBuffer--;
         DocumentContent c = buffer[nBuffer];
         notifyAll();
-        //System.err.println(nBuffer);
         return c;
     }
     
-    public synchronized void setFinish(){
-        
+    public synchronized void setFinish(){ 
         finish=true;
         notifyAll();
     }

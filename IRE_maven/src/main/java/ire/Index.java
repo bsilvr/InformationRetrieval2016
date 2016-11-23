@@ -20,6 +20,10 @@ import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.nustaq.serialization.FSTObjectInput;
 import org.nustaq.serialization.FSTObjectOutput;
 
+/**
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
+ * @author Bruno Silva <brunomiguelsilva@ua.pt>
+ */
 public class Index implements Serializable{
     private final String basefolder;
     
@@ -27,7 +31,7 @@ public class Index implements Serializable{
     private int countID = 0;
     private int termID;
     
-    HashMap<Integer, HashMap<Integer,Double>> dict;
+    private HashMap<Integer, HashMap<Integer,Double>> dict;
     private BidiMap<String, Integer> words;
     private HashMap<Integer,Double> posts;
     private HashMap<Integer, HashMap<Integer,Double>>[] alphabeticIndex;
@@ -70,18 +74,16 @@ public class Index implements Serializable{
     public synchronized void writeIndex(){
         try {
             // Write to file
-            System.err.println("Current Words Size: " + words.size());
-            System.out.println("Writing....");
+            System.out.println("Writing intermediary index to disk....");
             
             String filename = basefolder + "index_" + indexCount;
             indexCount++;
             
             FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename));
             out.writeObject(dict, HashMap.class);
-            out.close(); // required !
+            out.close();
             
             // Create new
-            
             dict = new HashMap<>();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
@@ -96,7 +98,7 @@ public class Index implements Serializable{
             
             FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename));
             out.writeObject(words);
-            out.close(); // required !
+            out.close();
 
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
@@ -121,27 +123,24 @@ public class Index implements Serializable{
         
     }
     
-        public void loadWords(){
+    public void loadWords(){
         HashMap<Integer, HashMap<Integer,Double>> result = null;
         try {
             FSTObjectInput in = new FSTObjectInput(new FileInputStream(basefolder + "words"));
             words = (BidiMap<String, Integer>)in.readObject();
             in.close();
             
-        } catch (IOException ex) {
-            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
     }
     
     public void dumpWords(){
         for(HashMap.Entry<String, Integer> entry : words.entrySet()){
             System.out.println(entry.getKey() + ": " + entry.getValue());
         }
-        
     }
+    
     private ArrayList<String> readDir(){
         File folder = new File(basefolder);
         ArrayList<String> files = new ArrayList<>();

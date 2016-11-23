@@ -6,7 +6,7 @@
 package ire;
 
 /**
- *
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class Document {

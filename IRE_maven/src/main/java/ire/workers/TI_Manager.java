@@ -12,18 +12,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
- * @author bernardo
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
+ * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class TI_Manager extends Thread{
     private final String[] stopWordsArray;
     private final DocumentProcessor docProc;
     private final Indexer indexer;
     private final int nthreads;
-    
     private DocumentContent buf;
 
-   
     public TI_Manager(int nthreads, DocumentProcessor docProc, String[] stopWordsArray){
         this.docProc = docProc;
         this.stopWordsArray = stopWordsArray;
@@ -33,11 +31,7 @@ public class TI_Manager extends Thread{
     
     @Override
     public void run() {
-        try {
-            sleep(1000);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(TI_Manager.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        
         TI_Worker[] thread_pool = new TI_Worker[nthreads];
         buf = docProc.getNextDocument();
         while(buf != null){
@@ -50,7 +44,6 @@ public class TI_Manager extends Thread{
                 buf = docProc.getNextDocument();
             }
             if (buf == null){
-                
                 break;
             }
             for(int i = 0; i < nthreads; i++){
@@ -61,10 +54,8 @@ public class TI_Manager extends Thread{
                 }
                 thread_pool[i] = null;
             }
-                
-            //System.out.println(Thread.activeCount());
         }
-        System.out.println("Manageer out");
+        System.out.println("Manager has Finished...");
         indexer.writeLast();
     }
     

@@ -7,12 +7,10 @@ package ire.DocumentProcessors;
 
 import ire.Buffer;
 import ire.CorpusFile;
-import ire.Document;
 import ire.DocumentContent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -21,13 +19,12 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 /**
- *
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class CsvProcessor implements Processor{
     
     private final Buffer buffer;
-    
     private final static Pattern PATTERN = Pattern.compile("(?s)<code>.*?</code>|(?s)<CODE>.*?</CODE>|<(.)*?>|(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
     
     public CsvProcessor(Buffer b){
@@ -35,9 +32,8 @@ public class CsvProcessor implements Processor{
     }
     
     @Override
-    public ArrayList<Document> process(CorpusFile file){
+    public void process(CorpusFile file){
         
-        ArrayList<Document> documents = new ArrayList<>();
         File cf = new File(file.getPath());
         Charset utf8charset = Charset.forName("UTF-8");
         CSVParser parser;
@@ -46,12 +42,10 @@ public class CsvProcessor implements Processor{
         boolean firstTime = true;
         StringBuilder currentDoc = new StringBuilder();
         String current;
-        Document doc;
         try {
             parser = CSVParser.parse(cf, utf8charset, CSVFormat.DEFAULT);
             for (CSVRecord csvRecord : parser) {
                 if(nLine == 0){ nLine++; continue; }
-                nLine++;
                 
                 if(firstTime){
                     firstTime = false;
@@ -72,20 +66,15 @@ public class CsvProcessor implements Processor{
                 }
                 current = currentDoc.toString();              
                 current = parseTags(current);
-
-                //doc = new Document(file.getPath(), Integer.parseInt(csvRecord.get(0)));
-                //documents.add(doc);
                 
-                buffer.addItem(new DocumentContent(current));
+                buffer.addItem(new DocumentContent(current, file.getPath(), nLine));
                 
                 currentDoc.setLength(0);
-               
-                
+                nLine++;
             }
         } catch (IOException ex) {
             Logger.getLogger(CsvProcessor.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return documents;
     }
     
     @Override
@@ -94,9 +83,6 @@ public class CsvProcessor implements Processor{
     }
         
     private static String parseTags(String string) {
-        /*string = string.replaceAll("(?s)<code>.*?</code>", "");
-        string = string.replaceAll("(?s)<CODE>.*?</CODE>", "");
-        string = string.replaceAll("<(.|\n)*?>", "");*/
         return PATTERN.matcher(string).replaceAll("");
     }
 }

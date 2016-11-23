@@ -6,16 +6,14 @@
 package ire.DocumentProcessors;
 
 import ire.CorpusFile;
-import ire.Document;
 import ire.DocumentContent;
-import java.util.ArrayList;
 
 /**
  *
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public interface Processor {
-    public ArrayList<Document> process(CorpusFile file);
+    public void process(CorpusFile file);
     
     public DocumentContent getDocument();
 }

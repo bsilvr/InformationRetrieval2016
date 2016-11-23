@@ -6,19 +6,22 @@
 package ire;
 
 /**
- *
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class DocumentContent {
-    static int id = 0;
+    private static int id = 0;
 
-    int docId;
+    private int docId;
+    private String filePath;
+    private int startLine;
+    private String content;
     
-    String content;
-    
-    public DocumentContent(String content){
+    public DocumentContent(String content, String filePath, int startLine){
         this.content = content;
         this.docId = getID();
+        this.filePath = filePath;
+        this.startLine = startLine;
     }
 
     public String getContent() {
@@ -31,5 +34,19 @@ public class DocumentContent {
     
     private static synchronized int getID(){
         return Document.id++;
+    }
+
+    /**
+     * @return the filePath
+     */
+    public String getFilePath() {
+        return filePath;
+    }
+    
+    /**
+     * @return the startLine
+     */
+    public int getStartLine() {
+        return startLine;
     }
 }

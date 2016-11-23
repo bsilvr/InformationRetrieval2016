@@ -13,11 +13,11 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 /**
- *
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class CorpusReader {
-    static String [] ignoreExtensions = {".pdf", ".docx", ".txt"};
+    private String [] ignoreExtensions;
     
     private int currentFile;
     private boolean finishedReadDir;
@@ -25,10 +25,19 @@ public class CorpusReader {
     
     private CorpusFile[] corpusIterator;
     
+    public CorpusReader(String [] ignoreExtensions){
+        currentFile = 0;
+        finishedReadDir = false;
+        files = new ArrayList<>();
+        this.ignoreExtensions = ignoreExtensions;
+    }
+    
     public CorpusReader(){
         currentFile = 0;
         finishedReadDir = false;
         files = new ArrayList<>();
+        String [] t = {".pdf", ".docx", ".txt"};
+        this.ignoreExtensions = t;
     }
     
     public synchronized void readDir(String path){
@@ -75,7 +84,6 @@ public class CorpusReader {
             } catch (InterruptedException ex) {
             }
         }
-        
         return corpusIterator[currentFile++];
     }
 }

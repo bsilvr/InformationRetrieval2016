@@ -16,7 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class IRE {
@@ -25,46 +25,64 @@ public class IRE {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        int mb = 1024*1024;
-		
-		//Getting the runtime reference from system
-		Runtime runtime = Runtime.getRuntime();
-		
-		System.out.println("##### Heap utilization statistics [MB] #####");
-		
-		//Print used memory
-		System.out.println("Used Memory:" 
-			+ (runtime.totalMemory() - runtime.freeMemory()) / mb);
-
-		//Print free memory
-		System.out.println("Free Memory:" 
-			+ runtime.freeMemory() / mb);
-		
-		//Print total available memory
-		System.out.println("Total Memory:" + runtime.totalMemory() / mb);
-
-		//Print Maximum available memory
-		System.out.println("Max Memory:" + runtime.maxMemory() / mb);
-        // configurações
+    
+        // Settings
+        
+        // Number of threads reading a file in the dir
         int nthreads_dp = 1;
+        
+        // Number of threads tokenizing and indexing a document
         int nthreads_ti = 100;
         
+        // Directory to index
         String dir = "stacksample";
+        
+        // Stop words file
         String stopWordsFile = "stopwords_en.txt";
         
         //Max documents in ram
         int nBuffer = 100;
         
+        // Extensions to ignore when reading dir
+        String [] ignoreExtensions = {".pdf", ".docx", ".txt"};
+        
+        
         // String documentMappingPath = "";
+        
+        // Whether the tokenizer should stemm words or not
         // boolean stemming = true;
+        
+        // Whether the tokenizer should remove stop words or not
         // boolean removeStopWords = true;
         
-        ////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////
+        int mb = 1024*1024;
+		
+        //Getting the runtime reference from system
+        Runtime runtime = Runtime.getRuntime();
+
+        System.out.println("##### Heap utilization statistics [MB] #####");
+
+        //Print used memory
+        System.out.println("Used Memory:" 
+                + (runtime.totalMemory() - runtime.freeMemory()) / mb);
+
+        //Print free memory
+        System.out.println("Free Memory:" 
+                + runtime.freeMemory() / mb);
+
+        //Print total available memory
+        System.out.println("Total Memory:" + runtime.totalMemory() / mb);
+
+        //Print Maximum available memory
+        System.out.println("Max Memory:" + runtime.maxMemory() / mb);
+        
+        /////////////////////////////////////////////////////////////////////////////////
         double startTime = System.currentTimeMillis();
         double endTime;
         double totalTime;
         
-        CorpusReader corpus = new CorpusReader();
+        CorpusReader corpus = new CorpusReader(ignoreExtensions);
         DocumentProcessor docProc = new DocumentProcessor(nBuffer);
         
         // Guardar stopwords numa Array List
@@ -116,7 +134,7 @@ public class IRE {
         
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime)/1000;
-        System.out.println("Finished Indexing: "+totalTime+" seconds.");
+        System.out.println("Finished Merging Index: "+totalTime+" seconds.");
     }
     
 }
