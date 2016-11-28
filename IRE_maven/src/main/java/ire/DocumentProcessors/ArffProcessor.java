@@ -4,17 +4,6 @@
  * and open the template in the editor.
  */
 package ire.DocumentProcessors;
-
-import ire.CorpusFile;
-import ire.Document;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 /**
  *
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
@@ -22,7 +11,7 @@ import java.util.logging.Logger;
 public class ArffProcessor {
     
    
-    public static String process(Document doc){
+    /*public static String process(Document doc){
         
         File cf = new File(doc.getFilePath());
         
@@ -33,9 +22,8 @@ public class ArffProcessor {
                 // process the line.
                 idx++;
                 if(idx == nLine){
-                    String[] parts = line.split("\"");
-                    parts[1] = parts[1].replace("<e>", "");
-                    parts[1] = parts[1].replace("</e>", "");
+                    String[] parts = StringUtils.split(line, "\"");
+                    parts[1] = parts[1].replaceAll("<.e>", "");
                     return parts[1];
                 }
                 
@@ -72,5 +60,5 @@ public class ArffProcessor {
             Logger.getLogger(ArffProcessor.class.getName()).log(Level.SEVERE, null, ex);
         }
         return documents;
-    }
+    }*/
 }

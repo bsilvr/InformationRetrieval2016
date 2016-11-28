@@ -5,53 +5,131 @@
  */
 package ire;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import ire.Objects.DocumentList;
+import ire.Objects.Index;
+import java.util.HashMap;
 
 /**
- *
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class Indexer {
-    final String index_path = "index.txt";
     
+    private static Index index;
+    private static DocumentList documents;
     
-    private Index index;
+    private int writeThreshold;
+    private static Runtime runtime = Runtime.getRuntime();
+    private static int mb = 1024*1024;
+    private boolean debug;
     
     public Indexer(){
-        index = new Index();
-    }
-    
-    public Indexer(Index idx){
-        index = idx;
-    }
-    
-    public void indexToken(String[] tokens, int docId){
-        for (String token : tokens){
-            index.addTerm(token, docId);
+        if(index == null){
+            index = new Index();
         }
-        
+        if(documents == null){
+            documents = new DocumentList();
+        }
+        writeThreshold = ((int)(runtime.maxMemory()/mb))*100;
+        this.debug = false;
     }
     
-    public void writeIndex(){
-        File fl = new File(index_path);
-        PrintWriter writer;
-        try {
-            writer = new PrintWriter(fl, "UTF-8");
-            
-            for(String i: index.getSortedWords()){
-                Dictionary d = index.get(i.hashCode());
-                
-                writer.println(d.getTerm()+";"+d.getnDocs()+";"+d.getPostingList().toString());
+    public Indexer(int threshold, boolean debug, String basefolder){
+        if(index == null){
+            index = new Index(basefolder, debug);
+        }
+        if(documents == null){
+            documents = new DocumentList();
+        }
+        writeThreshold = threshold;
+        this.debug = debug;
+    }
+    
+    public Indexer(String basefolder, boolean debug){
+        if(index == null){
+            index = new Index(basefolder, debug);
+        }
+        if(documents == null){
+            documents = new DocumentList();
+        }
+        writeThreshold = ((int)(runtime.maxMemory()/mb))*100;
+        this.debug = debug;
+    }
+    
+    public Indexer(String basefolder){
+        if(index == null){
+            index = new Index(basefolder, false);
+        }
+        if(documents == null){
+            documents = new DocumentList();
+        }
+        writeThreshold = ((int)(runtime.maxMemory()/mb))*100;
+        this.debug = false;
+    }
+    
+    public Indexer(boolean debug){
+        if(index == null){
+            index = new Index(false);
+        }
+        if(documents == null){
+            documents = new DocumentList();
+        }
+        writeThreshold = ((int)(runtime.maxMemory()/mb))*100;
+        this.debug = debug;
+    }
+    
+    public void indexToken(int docId, HashMap<String,Double> weight, double doc_weight){
+        for(HashMap.Entry<String, Double> entry : weight.entrySet()){
+            index.addTerm(entry.getKey(), docId, weight.get(entry.getKey())/doc_weight);
+        }
+
+        if ((docId % writeThreshold == 0 && docId != 0) ){
+            if(debug){
+                System.out.println("Free Memory:" + runtime.freeMemory() / mb);
             }
-            
-            writer.close();
-        } catch (FileNotFoundException | UnsupportedEncodingException ex) {
-            Logger.getLogger(Indexer.class.getName()).log(Level.SEVERE, null, ex);
+            index.writeIndex();
         }
     }
+    
+    public void indexToken(int docId, String[] tokens){
+        for(String entry : tokens){
+            index.addTerm(entry, docId, 0);
+        }
+
+        if ((docId % writeThreshold == 0 && docId != 0) ){
+            if(debug){
+                System.out.println("Free Memory:" + runtime.freeMemory() / mb);
+            }
+            index.writeIndex();
+        }
+    }
+    
+    public void addDocument(String filePath, int docid, int line){
+        documents.addDocument(filePath, docid, line);
+        if ((docid % writeThreshold == 0 && docid != 0) ){
+            if(debug){
+                System.out.println("Writing Documens");
+            }
+            documents.writeDocuments();
+        }
+    }
+    
+    public void writeLast(){
+        index.writeIndex();
+        index.writeWords();
+        documents.writeDocuments();
+    }
+    
+    public void mergeIndex(){
+        index.mergeIndex();
+    }
+    
+    public void loadWords(){
+        index.loadWords();
+    }
+    
+    public void dumpWords(){
+        index.dumpWords();
+    }
+    
 }

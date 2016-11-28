@@ -5,18 +5,18 @@
  */
 package ire;
 
-import ire.DocumentProcessors.ArffProcessor;
+import ire.workers.DP_Worker;
+import ire.workers.TI_Manager;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class IRE {
@@ -25,74 +25,134 @@ public class IRE {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        double startTime = System.currentTimeMillis();
+    
+        // Settings
         
-        CorpusReader corpus = new CorpusReader();
-        DocumentProcessor docProc = new DocumentProcessor();
-        Indexer indexer = new Indexer();
+        // Number of threads reading a file in the dir
+        int nthreads_dp = 1;
+        
+        // Number of threads tokenizing and indexing a document
+        int nthreads_ti = 100;
+        
+        // Directory to index
+        String dir = "stacksample";
+        
+        // Stop words file
+        String stopWordsFile = "stopwords_en.txt";
+        
+        //Max documents in ram
+        int nBuffer = 100;
+        
+        // Extensions to ignore when reading dir
+        String [] ignoreExtensions = {".pdf", ".docx", ".txt"};
+        
+        // Enable or disable debug mode (prints more info)
+        boolean debug = false;
+        
+        // Base Folder to store indexes and other necessary data structures
+        String indexBaseFolder = "indexes";
+        
+        // Whether the tokenizer should stemm words or not
+        boolean stemming = true;
+        
+        // Whether the tokenizer should remove stop words or not
+        boolean removeStopWords = true;
+        
+        // Boolean index - if true no weights are calculated
+        boolean bolleanIndex = false;
+        
+        /////////////////////////////////////////////////////////////////////////////////
+        int mb = 1024*1024;
+		
+        
+        if(debug){
+            //Getting the runtime reference from system
+            Runtime runtime = Runtime.getRuntime();
+
+            System.out.println("##### Heap utilization statistics [MB] #####");
+
+            //Print used memory
+            System.out.println("Used Memory:" 
+                    + (runtime.totalMemory() - runtime.freeMemory()) / mb);
+
+            //Print free memory
+            System.out.println("Free Memory:" 
+                    + runtime.freeMemory() / mb);
+
+            //Print total available memory
+            System.out.println("Total Memory:" + runtime.totalMemory() / mb);
+
+            //Print Maximum available memory
+            System.out.println("Max Memory:" + runtime.maxMemory() / mb);
+            
+            // Print all settings
+        }
+        
+        /////////////////////////////////////////////////////////////////////////////////
+        double startTime = System.currentTimeMillis();
+        double endTime;
+        double totalTime;
+        
+        CorpusReader corpus = new CorpusReader(ignoreExtensions);
+        DocumentProcessor docProc = new DocumentProcessor(nBuffer);
         
         // Guardar stopwords numa Array List
-        File stopWords = new File("stopwords_en.txt");
+        File stopWords = new File(stopWordsFile);
         ArrayList<String> stopWordsList = new ArrayList<>();
         try(BufferedReader br = new BufferedReader(new FileReader(stopWords))) {
             for(String line; (line = br.readLine()) != null; ) {
                 stopWordsList.add(line);
             }
         } catch (IOException ex) {
-            Logger.getLogger(ArffProcessor.class.getName()).log(Level.SEVERE, null, ex);
         }
         String[] stopWordsArray = stopWordsList.toArray(new String[0]);
         
         // Listar ficheiros, e respetivas extenções, de um determinado diretorio
-        corpus.readDir("corpus-RI");
+        corpus.readDir(dir);
         
-        // Dividir e guardar numa array list todos os documentos encontrados nos ficheiros
-        CorpusFile file = corpus.getNextFile();
-        while(file != null){
-            docProc.processDocument(file);
-            file = corpus.getNextFile();
-        }
-        docProc.finishReadingDocs();
-        
-        // Tokenizar cada documento e indexar cada token 
-        Document doc = docProc.getNextDocument();
-        String content = "";
-        while(doc != null){
-            content = docProc.getDocumentContent(doc);
-            Tokenizer tokenizer = new Tokenizer(stopWordsArray);
-            String[] tokens =  tokenizer.tokenize(content, doc);
-            
-            indexer.indexToken(tokens, doc.getDocId());
-            
-            doc = docProc.getNextDocument();
-            
+        //Launching threads
+        DP_Worker[] thread_pool_dp = new DP_Worker[nthreads_dp];
+  
+        for(int i = 0; i < nthreads_dp; i++){
+            thread_pool_dp[i] = new DP_Worker(corpus, docProc);
+            thread_pool_dp[i].start();
         }
         
-        
-         
-        Runtime runtime = Runtime.getRuntime();
+        TI_Manager timnger = new TI_Manager(nthreads_ti, docProc, stopWordsArray, debug, indexBaseFolder, stemming, removeStopWords, bolleanIndex);
+        timnger.start();
 
-        NumberFormat format = NumberFormat.getInstance();
-
-        long allocatedMemory = runtime.totalMemory();
-        long freeMemory = runtime.freeMemory();
-
+        for(int i = 0; i < nthreads_dp; i++){
+            try {
+                thread_pool_dp[i].join();
+                thread_pool_dp[i] = null;
+            } catch (InterruptedException ex) {
+                Logger.getLogger(IRE.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         
-        System.out.println("Allocated memory before write index: " + format.format((allocatedMemory-freeMemory) / 1024)+"Mb");
+        try {
+            timnger.join();
+            timnger = null;
+        } catch (InterruptedException ex) {
+            Logger.getLogger(IRE.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
-        indexer.writeIndex();
-        docProc.writeDocuments();
+        corpus = null;
+        stopWordsArray = null;
+        docProc = null;
+        System.gc();
         
-        format = NumberFormat.getInstance();
-
-        allocatedMemory = runtime.totalMemory();
-        freeMemory = runtime.freeMemory();
-
+        endTime = System.currentTimeMillis();
+        totalTime = (endTime - startTime)/1000;
+        System.out.println("Finished Indexing: "+totalTime+" seconds.");
         
-        System.out.println("Allocated memory after write index: " + format.format((allocatedMemory-freeMemory) / 1024)+"Mb");
-        double endTime   = System.currentTimeMillis();
-        double totalTime = (endTime - startTime)/1000;
-        System.out.println("Runtime: "+totalTime+" seconds.");
+        Indexer indexer = new Indexer(indexBaseFolder, debug);
+        indexer.loadWords();
+        indexer.mergeIndex();
+        
+        endTime = System.currentTimeMillis();
+        totalTime = (endTime - startTime)/1000;
+        System.out.println("Finished Merging Index: "+totalTime+" seconds.");
     }
     
 }

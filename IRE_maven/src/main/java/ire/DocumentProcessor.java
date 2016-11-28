@@ -5,76 +5,42 @@
  */
 package ire;
 
-import ire.DocumentProcessors.ArffProcessor;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import ire.DocumentProcessors.CsvProcessor;
+import ire.DocumentProcessors.Processor;
+import ire.Objects.Buffer;
+import ire.Objects.CorpusFile;
+import ire.Objects.DocumentContent;
 
 /**
- *
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class DocumentProcessor {
+    private Processor proc;
+    private Buffer buffer;
     
-    private ArrayList<Document> documents;
-    private Iterator<Document> documentsIterator;
-    
-    final String doc_path = "doc_dict.txt";    
-    
-    public DocumentProcessor(){
-        documents = new ArrayList<>();
-        // criar pasta para guardar os documentos em formato unico
+    public DocumentProcessor(int nBuffer){
+        this.buffer = new Buffer(nBuffer);
     }
     
     public void processDocument(CorpusFile cfile){
         // Ver a extensao e enviar o path para a função adequada.
-        if(cfile.getExtension().equals("arff")){
-            documents.addAll(ArffProcessor.identify(cfile));
+        //if(cfile.getExtension().equals("arff")){
+            //proc = new ArffProcessor(buffer);
+            //proc.process(cfile);
+        //}
+        //else 
+        if(cfile.getExtension().equals("csv")){
+            proc = new CsvProcessor(buffer);
+            proc.process(cfile);
         }
     }
     
-    public void finishReadingDocs(){
-        documentsIterator = documents.iterator();
+    public DocumentContent getNextDocument(){
+        return proc.getDocument();
     }
     
-    public ArrayList<Document> getDocuments() {
-        return documents;
+    public void setFinish(){
+        buffer.setFinish();
     }
-    
-    public Document getNextDocument(){
-        if(documentsIterator.hasNext()) {
-            return documentsIterator.next();    
-        }
-        return null;
-    }
-    
-    public String getDocumentContent(Document doc){
-        if (doc.getFilePath().endsWith(".arff")){
-            return ArffProcessor.process(doc);
-        } 
-        return null;
-    }
-    
-    public void writeDocuments(){
-        File fl = new File(doc_path);
-        PrintWriter writer;
-        try {
-            writer = new PrintWriter(fl, "UTF-8");
-            
-            for(Document i: documents){
-                
-                writer.println(i.getDocId() +";"+ i.getFilePath() +";"+ i.getOriginalDocId());
-            }
-            
-            writer.close();
-        } catch (FileNotFoundException | UnsupportedEncodingException ex) {
-            Logger.getLogger(Indexer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
 }
