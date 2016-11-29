@@ -14,11 +14,13 @@ public class Result {
     private int docId;
     private String filePath;
     private int startLine;
+    private double score;
     
-    public Result(String filePath, int startLine, int docId){
+    public Result(String filePath, int startLine, int docId, double score){
         this.docId = docId;
         this.filePath = filePath;
         this.startLine = startLine;
+        this.score = score;
     }
 
     public int getDocId() {
@@ -37,5 +39,26 @@ public class Result {
      */
     public int getStartLine() {
         return startLine;
+    }
+    
+    public double getScore(){
+        return score;
+    }
+    
+    public void addScore(double score){
+        this.score += score;
+    }
+    
+    public int compareTo(Result o){
+        return (this.score > o.getScore()) ? 1 : (this.score < o.getScore()) ? -1 : 0;
+    }
+    
+    @Override
+    public boolean equals(Object o){
+        if(o == null) return false;
+        if(this == o) return true;
+        Result tmp = (Result)o;
+        return this.score == tmp.getScore();
+        
     }
 }

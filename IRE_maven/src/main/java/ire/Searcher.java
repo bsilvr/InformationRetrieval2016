@@ -13,7 +13,10 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.collections4.BidiMap;
@@ -28,20 +31,22 @@ import org.nustaq.serialization.FSTObjectInput;
 public class Searcher {
     private HashMap<Integer, Pair<Integer,Integer>> documents;
     private HashMap<Integer, HashMap<Integer,Double>> index;
-    private HashMap<String,Integer> filesMapping;
+    private BidiMap<String,Integer> filesMapping;
     private BidiMap<String, Integer> words;
-    private final Result[] results;
+    private Result[] results;
     private final Tokenizer tokenizer;
+    private final int numDocs;
     
     private final String indexPath;
     
     public Searcher(String indexPath, String stopWordsFile, int numResults, boolean debug){
         documents = new HashMap<>();
         index = new HashMap<>();
-        filesMapping = new HashMap<>();
+        filesMapping = new DualHashBidiMap();
         words = new DualHashBidiMap();
-        results = new Result[numResults];
+        results = null;
         tokenizer = new Tokenizer(loadStopWords(stopWordsFile), debug);
+        numDocs = 3000000;
         
         this.indexPath = indexPath;
         
@@ -49,16 +54,57 @@ public class Searcher {
     
     public Result[] search(String query){
         String [] tokens = tokenizer.tokenize(query);
-        HashMap<String, Double> queryWeights = calculateWeight(tokens);
-        for(String word : tokens){
-            
+        double idf = calculateIdf(tokens);
+        HashMap<String, Double> queryWeights = calculateWeight(tokens, idf);
+        results = calculateResult(queryWeights);
+        
+        return results;
+    }
+    
+    private Result[] calculateResult(HashMap<String, Double> queryWeights){
+        
+        Comparator<Result> comparator = (Result a, Result b) -> a.compareTo(b);
+        ArrayList<Result> scores = new ArrayList<>();
+        for(HashMap.Entry<String, Double> entry : queryWeights.entrySet()){ 
+            HashMap<Integer, Double> postList = getPostingList(entry.getKey());
+            for(HashMap.Entry<Integer, Double> e : postList.entrySet()){
+                double tmpScore = entry.getValue()*e.getValue();
+                int result = scores.indexOf(e.getKey());
+                if(result != -1){
+                   scores.get(result).addScore(tmpScore);
+                }
+                else{
+                    scores.add(new Result(filesMapping.getKey(documents.get(e.getKey()).getLeft()), documents.get(e.getKey()).getRight(),  e.getKey(),tmpScore));
+                }
+            }
         }
         return results;
     }
     
-    private HashMap<String, Double> calculateWeight(String[] tokens){
+    private double calculateIdf(String [] tokens){
+        return 0;
+    }
+    
+    private HashMap<Integer, Double> getPostingList(String term){
+        
+        int termId;
+        if(words.containsKey(term)){
+            termId = words.get(term);
+        }
+        else return null;
+        
+        loadIndex(term.charAt(0));
+        
+        if(index.containsKey(termId)){
+            return index.get(termId);
+        }
+        return null;
+    }
+    
+    private HashMap<String, Double> calculateWeight(String[] tokens, double idf){
         //Calcular pesos palavras e passar ao indexer para dar merge ao indice global.
             HashMap<String,Integer> counts = new HashMap<>();
+            
             int count;
             for (String token : tokens) {
                 if (!counts.containsKey(token)) {
@@ -75,6 +121,7 @@ public class Searcher {
             for(HashMap.Entry<String, Integer> entry : counts.entrySet()){ 
                 tmp = 1+Math.log(counts.get(entry.getKey()));
                 sum += Math.pow(tmp, 2);
+                tmp = tmp*idf;
                 weights.put(entry.getKey(), tmp);
             }
             double doc_length = Math.sqrt(sum);
@@ -115,7 +162,7 @@ public class Searcher {
             in.close();
             
             in = new FSTObjectInput(new FileInputStream(filesMapPath));
-            filesMapping = (HashMap<String,Integer>)in.readObject();
+            filesMapping = (BidiMap<String,Integer>)in.readObject();
             in.close();
             
         } catch (IOException | ClassNotFoundException ex) {
