@@ -78,7 +78,7 @@ public class Searcher {
                 }
             }
         }
-        return results;
+        return scores.toArray(new Result[0]);
     }
     
     private double calculateIdf(String [] tokens){

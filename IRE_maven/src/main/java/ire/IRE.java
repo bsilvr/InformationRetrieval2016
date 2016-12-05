@@ -149,6 +149,7 @@ public class IRE {
         Indexer indexer = new Indexer(indexBaseFolder, debug);
         indexer.loadWords();
         indexer.mergeIndex();
+        indexer.mergeDocuments();
         
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime)/1000;

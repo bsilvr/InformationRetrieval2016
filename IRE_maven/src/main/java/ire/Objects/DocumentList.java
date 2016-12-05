@@ -6,14 +6,19 @@
 package ire.Objects;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.collections4.BidiMap;
+import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.nustaq.serialization.FSTObjectInput;
 import org.nustaq.serialization.FSTObjectOutput;
 
 /**
@@ -27,11 +32,11 @@ public class DocumentList {
     private boolean debug;
     private int docCount = 0;
     
-    private HashMap<String,Integer> filesMapping;
+    private BidiMap<String,Integer> filesMapping;
     private HashMap<Integer, Pair<Integer,Integer>> documents;
             
     public DocumentList(){
-        filesMapping = new HashMap<>();
+        filesMapping = new DualHashBidiMap();
         documents = new HashMap<>();
         basefolder = "indexes";
         debug = false;
@@ -41,7 +46,7 @@ public class DocumentList {
     }
     
     public DocumentList(String bf, boolean debug){
-        filesMapping = new HashMap<>();
+        filesMapping = new DualHashBidiMap();
         documents = new HashMap();
         basefolder = bf;
         this.debug = debug;
@@ -51,7 +56,7 @@ public class DocumentList {
     }
     
     public DocumentList(String bf){
-        filesMapping = new HashMap<>();
+        filesMapping = new DualHashBidiMap();
         documents = new HashMap();
         basefolder = bf;
         this.debug = false;
@@ -61,7 +66,7 @@ public class DocumentList {
     }
     
     public DocumentList(boolean debug){
-        filesMapping = new HashMap<>();
+        filesMapping = new DualHashBidiMap();
         documents = new HashMap();
         basefolder = "indexes";
         this.debug = debug;
@@ -97,6 +102,102 @@ public class DocumentList {
         }
         documents = new HashMap<>();
         docCount++;
+    }
+    
+    public void writeFileMap(){
+        try {
+            String filename = basefolder + "/other/fileMapping";
+            FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename));
+            out.writeObject(filesMapping);
+            out.close();
+
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+        }    
+    }
+    
+    public void mergeDocuments(){
+        ArrayList<String> files = readDir();
+        //writeMergeDocuments();
+        
+        for(String f : files){
+            documents.putAll(readObject("/other/documents/" + f));
+            if (debug){
+                System.err.println("Merged " + f);
+            }
+            new File(basefolder + "/other/documents/" + f).delete();
+            System.gc();
+        } 
+        writeToDisk();
+    }
+    
+    private ArrayList<String> readDir(){
+        File folder = new File(basefolder + "/other/documents/");
+        ArrayList<String> files = new ArrayList<>();
+        for (final File fileEntry : folder.listFiles()) {
+            if(fileEntry.getName().equals(".DS_Store") || fileEntry.isDirectory()){
+                continue;
+            }
+            files.add(fileEntry.getName());
+        }
+        folder = null;
+        return files;
+    }
+    
+    private HashMap<Integer, Pair<Integer,Integer>> readObject(String filename){
+        try {
+            FSTObjectInput in = new FSTObjectInput(new FileInputStream(basefolder + filename));
+            Object res = in.readObject(HashMap.class);
+            in.close();
+            return (HashMap<Integer, Pair<Integer,Integer>>) res;
+        } catch (IOException ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+    
+    
+    
+    private void writeToDisk(){
+        try {
+            String filename = basefolder + "/other/documents_final";
+            
+            FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename));
+            out.writeObject(documents);
+            out.close();
+                
+        }catch (FileNotFoundException ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+        }catch (IOException ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void writeMergeDocuments(){
+        HashMap<Integer, Pair<Integer,Integer>> docs = new HashMap<>();
+        try {
+            FSTObjectOutput out;
+            
+            String filename = basefolder + "/other/documents_final";
+
+            out = new FSTObjectOutput(new FileOutputStream(filename));
+            out.writeObject(docs);
+            out.close();
+                
+            out = null;
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
     
     private static synchronized int getFileID(){

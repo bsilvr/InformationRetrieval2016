@@ -118,10 +118,15 @@ public class Indexer {
         index.writeIndex();
         index.writeWords();
         documents.writeDocuments();
+        documents.writeFileMap();
     }
     
     public void mergeIndex(){
         index.mergeIndex();
+    }
+    
+    public void mergeDocuments(){
+        documents.mergeDocuments();
     }
     
     public void loadWords(){
