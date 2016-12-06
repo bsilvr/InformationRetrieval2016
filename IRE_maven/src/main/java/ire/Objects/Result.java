@@ -50,7 +50,8 @@ public class Result {
     }
     
     public int compareTo(Result o){
-        return (this.score > o.getScore()) ? 1 : (this.score < o.getScore()) ? -1 : 0;
+        
+        return (this.score > o.getScore()) ? 1 : (this.score < o.getScore()) ? -1 : (this.docId > o.getDocId()) ? 1 : (this.docId < o.getDocId()) ? -1 : 0;
     }
     
     @Override
@@ -58,7 +59,7 @@ public class Result {
         if(o == null) return false;
         if(this == o) return true;
         Result tmp = (Result)o;
-        return this.score == tmp.getScore();
+        return this.docId == tmp.getDocId();
         
     }
 }

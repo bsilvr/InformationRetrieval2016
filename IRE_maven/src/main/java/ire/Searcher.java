@@ -54,35 +54,54 @@ public class Searcher {
     
     public Result[] search(String query){
         String [] tokens = tokenizer.tokenize(query);
-        double idf = calculateIdf(tokens);
-        HashMap<String, Double> queryWeights = calculateWeight(tokens, idf);
-        results = calculateResult(queryWeights);
+        HashMap<String, Double> idfs = calculateIdf(tokens);
+        HashMap<String, Double> queryWeights = calculateWeight(tokens, idfs);
+        results = hash2array(calculateResult(queryWeights));
         
         return results;
     }
     
-    private Result[] calculateResult(HashMap<String, Double> queryWeights){
-        
+    private Result[] hash2array(HashMap<Integer, Double> scores){
         Comparator<Result> comparator = (Result a, Result b) -> a.compareTo(b);
-        ArrayList<Result> scores = new ArrayList<>();
+        SortedSet<Result> results = new TreeSet<>(comparator);
+        for(HashMap.Entry<Integer, Double> e : scores.entrySet()){ 
+            
+            results.add(new Result(filesMapping.getKey(documents.get(e.getKey()).getLeft()), documents.get(e.getKey()).getRight(),  e.getKey(),e.getValue()));
+
+        }
+        return results.toArray(new Result[0]);
+    }
+            
+                        
+
+    private HashMap<Integer, Double> calculateResult(HashMap<String, Double> queryWeights){
+        
+        
+        HashMap<Integer, Double> scores = new HashMap<>();
         for(HashMap.Entry<String, Double> entry : queryWeights.entrySet()){ 
             HashMap<Integer, Double> postList = getPostingList(entry.getKey());
             for(HashMap.Entry<Integer, Double> e : postList.entrySet()){
                 double tmpScore = entry.getValue()*e.getValue();
-                int result = scores.indexOf(e.getKey());
-                if(result != -1){
-                   scores.get(result).addScore(tmpScore);
+                
+                if(scores.containsKey(e.getKey())){
+                   tmpScore += scores.get(e.getKey());
+                   scores.put(e.getKey(), tmpScore);
                 }
                 else{
-                    scores.add(new Result(filesMapping.getKey(documents.get(e.getKey()).getLeft()), documents.get(e.getKey()).getRight(),  e.getKey(),tmpScore));
+                    scores.put(e.getKey(), tmpScore);
+                    
                 }
             }
         }
-        return scores.toArray(new Result[0]);
+        return scores;
     }
     
-    private double calculateIdf(String [] tokens){
-        return 0;
+    private HashMap<String, Double> calculateIdf(String [] tokens){
+        HashMap<String, Double> idfs = new HashMap<>();
+        for(String s : tokens){
+            idfs.put(s, Math.log(documents.size()/getPostingList(s).size()));
+        }
+        return idfs;
     }
     
     private HashMap<Integer, Double> getPostingList(String term){
@@ -92,7 +111,8 @@ public class Searcher {
             termId = words.get(term);
         }
         else return null;
-        
+        // Classe para guardar indices em memoria
+        //TODO
         loadIndex(term.charAt(0));
         
         if(index.containsKey(termId)){
@@ -101,7 +121,7 @@ public class Searcher {
         return null;
     }
     
-    private HashMap<String, Double> calculateWeight(String[] tokens, double idf){
+    private HashMap<String, Double> calculateWeight(String[] tokens, HashMap<String, Double> idfs){
         //Calcular pesos palavras e passar ao indexer para dar merge ao indice global.
             HashMap<String,Integer> counts = new HashMap<>();
             
@@ -120,8 +140,9 @@ public class Searcher {
             HashMap<String,Double> weights = new HashMap<>();
             for(HashMap.Entry<String, Integer> entry : counts.entrySet()){ 
                 tmp = 1+Math.log(counts.get(entry.getKey()));
+                tmp = tmp*idfs.get(entry.getKey());
                 sum += Math.pow(tmp, 2);
-                tmp = tmp*idf;
+                
                 weights.put(entry.getKey(), tmp);
             }
             double doc_length = Math.sqrt(sum);
