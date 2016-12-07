@@ -51,7 +51,7 @@ public class Result {
     
     public int compareTo(Result o){
         
-        return (this.score > o.getScore()) ? 1 : (this.score < o.getScore()) ? -1 : (this.docId > o.getDocId()) ? 1 : (this.docId < o.getDocId()) ? -1 : 0;
+        return (this.score < o.getScore()) ? 1 : (this.score > o.getScore()) ? -1 : (this.docId > o.getDocId()) ? 1 : (this.docId < o.getDocId()) ? -1 : 0;
     }
     
     @Override
@@ -61,5 +61,11 @@ public class Result {
         Result tmp = (Result)o;
         return this.docId == tmp.getDocId();
         
+    }
+    
+    @Override
+    public String toString(){
+        
+        return docId + " - " + filePath + " - " + startLine + " - " + score;
     }
 }

@@ -13,6 +13,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.SortedSet;
@@ -35,7 +36,7 @@ public class Searcher {
     private BidiMap<String, Integer> words;
     private Result[] results;
     private final Tokenizer tokenizer;
-    private final int numDocs;
+    private final int numResults;
     
     private final String indexPath;
     
@@ -46,7 +47,7 @@ public class Searcher {
         words = new DualHashBidiMap();
         results = null;
         tokenizer = new Tokenizer(loadStopWords(stopWordsFile), debug);
-        numDocs = 3000000;
+        this.numResults = numResults;
         
         this.indexPath = indexPath;
         
@@ -63,13 +64,14 @@ public class Searcher {
     
     private Result[] hash2array(HashMap<Integer, Double> scores){
         Comparator<Result> comparator = (Result a, Result b) -> a.compareTo(b);
-        SortedSet<Result> results = new TreeSet<>(comparator);
+        SortedSet<Result> resul = new TreeSet<>(comparator);
         for(HashMap.Entry<Integer, Double> e : scores.entrySet()){ 
             
-            results.add(new Result(filesMapping.getKey(documents.get(e.getKey()).getLeft()), documents.get(e.getKey()).getRight(),  e.getKey(),e.getValue()));
+            resul.add(new Result(filesMapping.getKey(documents.get(e.getKey()).getLeft()), documents.get(e.getKey()).getRight(),  e.getKey(),e.getValue()));
 
         }
-        return results.toArray(new Result[0]);
+        results = resul.toArray(new Result[0]);
+        return Arrays.copyOfRange(results, 0, numResults);
     }
             
                         

@@ -16,7 +16,7 @@ public class SE {
     public static void main(String [] args){
         
         
-        int numResults = 10;
+        int numResults = 100;
         boolean debug = false;
         String wordsPath = "indexes/other/words";
         String docsPath = "indexes/other/documents_final";
@@ -28,12 +28,11 @@ public class SE {
         searcher.loadWords(wordsPath);
         searcher.loadDocs(docsPath, filesMapPath);
         
-        String query = "today";
+        String query = "java class tostring";
         Result[] results = searcher.search(query);
-        
-        System.out.println("sasqw");
-        
-       
-        
+        for(Result a  : results){
+            System.out.println(a);
+        }
+                   
     }
 }
