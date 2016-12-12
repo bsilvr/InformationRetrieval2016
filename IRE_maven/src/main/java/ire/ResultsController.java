@@ -18,6 +18,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -37,6 +38,7 @@ public class ResultsController implements Initializable {
     @FXML private TableColumn<Result, String> score;
     @FXML private Button next;
     @FXML private Button previous;
+    @FXML private Label pageCount;
     
     private int page;
     private Searcher searcher;
@@ -67,6 +69,8 @@ public class ResultsController implements Initializable {
         for(Result a  : results){
             System.out.println(a);
         }
+        
+        pageCount.setText("Page: " + page + "/"+ searcher.getPageCount());
         docId.setCellValueFactory(new PropertyValueFactory<Result, String>("docId"));
         file.setCellValueFactory(new PropertyValueFactory<Result, String>("filePath"));
         score.setCellValueFactory(new PropertyValueFactory<Result, String>("score"));
@@ -79,14 +83,17 @@ public class ResultsController implements Initializable {
     private void handleNext(ActionEvent event) throws IOException {
         page+=1;
         Result[] results = searcher.getResultsPage(page);
-        for(Result a  : results){
-            System.out.println(a);
-        }
-        docId.setCellValueFactory(new PropertyValueFactory<Result, String>("docId"));
-        file.setCellValueFactory(new PropertyValueFactory<Result, String>("filePath"));
-        score.setCellValueFactory(new PropertyValueFactory<Result, String>("score"));
+        if (results != null){
+            
+            for(Result a  : results){
+                System.out.println(a);
+            }
+            docId.setCellValueFactory(new PropertyValueFactory<Result, String>("docId"));
+            file.setCellValueFactory(new PropertyValueFactory<Result, String>("filePath"));
+            score.setCellValueFactory(new PropertyValueFactory<Result, String>("score"));
 
-        tableView.getItems().setAll(results);
+            tableView.getItems().setAll(results);
+        }
     }
     
     @FXML

@@ -25,6 +25,7 @@
                <children>
                   <Button fx:id="previous" layoutX="223.0" layoutY="13.0" mnemonicParsing="false" onAction="#handlePrevious" text="Previous" />
                   <Button fx:id="next" layoutX="305.0" layoutY="13.0" mnemonicParsing="false" onAction="#handleNext" prefHeight="27.0" prefWidth="71.0" text="Next" />
+                  <Label fx:id="pageCount" layoutX="388.0" layoutY="18.0" prefHeight="17.0" prefWidth="96.0" text="Page " />
                </children>
             </AnchorPane>
         </items>
