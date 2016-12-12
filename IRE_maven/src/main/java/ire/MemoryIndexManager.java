@@ -44,6 +44,7 @@ public class MemoryIndexManager {
             i = (HashMap<Integer, HashMap<Integer,Double>>)in.readObject();
             in.close();
             idx = new MemoryIndex(initial, i);
+            indexes.add(idx);
             
             } catch (IOException | ClassNotFoundException ex) {
             }

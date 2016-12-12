@@ -33,8 +33,8 @@ public class Searcher {
     private BidiMap<String, Integer> words;
     private Result[] results;
     private final Tokenizer tokenizer;
-    private final int numResults;
     private final MemoryIndexManager indexManager;
+    private final int numResults;
         
     public Searcher(String indexPath, String stopWordsFile, int numResults, int maxIndex, boolean debug){
         documents = new HashMap<>();
