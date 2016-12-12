@@ -208,10 +208,11 @@ public class Searcher {
     }
     
    
-    public String getContent(String file, int startLine){
+    public String getContent(Result r){
+        int startLine = r.getStartLine();
         try {
             StringBuilder currentDoc = new StringBuilder();
-            File cf = new File(file);
+            File cf = new File(r.getFilePath());
             Charset utf8charset = Charset.forName("UTF-8");
             CSVParser parser;
             int nLine = 0;
