@@ -29,10 +29,10 @@ public class DocumentList {
     
     private static int fileID = 0;
     private final String basefolder;
-    private boolean debug;
+    private final boolean debug;
     private int docCount = 0;
     
-    private BidiMap<String,Integer> filesMapping;
+    private final BidiMap<String,Integer> filesMapping;
     private HashMap<Integer, Pair<Integer,Integer>> documents;
             
     public DocumentList(){
@@ -91,9 +91,9 @@ public class DocumentList {
     public synchronized void writeDocuments(){
         try {
             String filename = basefolder + "/other/documents/doc_" + docCount;
-            FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename));
-            out.writeObject(documents);
-            out.close();
+            try (FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename))) {
+                out.writeObject(documents);
+            }
 
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
@@ -107,9 +107,9 @@ public class DocumentList {
     public void writeFileMap(){
         try {
             String filename = basefolder + "/other/fileMapping";
-            FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename));
-            out.writeObject(filesMapping);
-            out.close();
+            try (FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename))) {
+                out.writeObject(filesMapping);
+            }
 
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
@@ -121,15 +121,20 @@ public class DocumentList {
     public void mergeDocuments(){
         ArrayList<String> files = readDir();
         //writeMergeDocuments();
-        
-        for(String f : files){
+        files.stream().map((f) -> {
             documents.putAll(readObject("/other/documents/" + f));
+            return f;
+        }).map((f) -> {
             if (debug){
                 System.err.println("Merged " + f);
             }
+            return f;
+        }).map((f) -> {
             new File(basefolder + "/other/documents/" + f).delete();
+            return f;
+        }).forEach((_item) -> {
             System.gc();
-        } 
+        }); 
         writeToDisk();
     }
     
@@ -148,9 +153,10 @@ public class DocumentList {
     
     private HashMap<Integer, Pair<Integer,Integer>> readObject(String filename){
         try {
-            FSTObjectInput in = new FSTObjectInput(new FileInputStream(basefolder + filename));
-            Object res = in.readObject(HashMap.class);
-            in.close();
+            Object res;
+            try (FSTObjectInput in = new FSTObjectInput(new FileInputStream(basefolder + filename))) {
+                res = in.readObject(HashMap.class);
+            }
             return (HashMap<Integer, Pair<Integer,Integer>>) res;
         } catch (IOException ex) {
             Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
@@ -168,9 +174,9 @@ public class DocumentList {
         try {
             String filename = basefolder + "/other/documents_final";
             
-            FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename));
-            out.writeObject(documents);
-            out.close();
+            try (FSTObjectOutput out = new FSTObjectOutput(new FileOutputStream(filename))) {
+                out.writeObject(documents);
+            }
                 
         }catch (FileNotFoundException ex) {
             Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);

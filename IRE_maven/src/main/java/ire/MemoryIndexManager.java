@@ -15,15 +15,14 @@ import org.nustaq.serialization.FSTObjectInput;
 
 /**
  *
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class MemoryIndexManager {
-    private final int maxIndex;
     private final String indexPath;
     private final Queue<MemoryIndex> indexes;
     
     public MemoryIndexManager(int maxIndex, String indexPath){
-        this.maxIndex = maxIndex;
         this.indexPath = indexPath;
         this.indexes = new CircularFifoQueue<>(maxIndex);
     }
@@ -40,9 +39,9 @@ public class MemoryIndexManager {
         }else{
             try {
             HashMap<Integer, HashMap<Integer,Double>> i;
-            FSTObjectInput in = new FSTObjectInput(new FileInputStream(indexPath + initial));
-            i = (HashMap<Integer, HashMap<Integer,Double>>)in.readObject();
-            in.close();
+                try (FSTObjectInput in = new FSTObjectInput(new FileInputStream(indexPath + initial))) {
+                    i = (HashMap<Integer, HashMap<Integer,Double>>)in.readObject();
+                }
             idx = new MemoryIndex(initial, i);
             indexes.add(idx);
             

@@ -17,18 +17,18 @@ import java.util.HashMap;
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class TI_Worker extends Thread{
-    private boolean debug;
-    private boolean booleanIndex;
-    private DocumentContent doc;
-    private Indexer indexer;
-    private Tokenizer tokenizer;
+    private final boolean debug;
+    private final boolean booleanIndex;
+    private final DocumentContent doc;
+    private final Indexer indexer;
+    private final Tokenizer tokenizer;
 
     public TI_Worker(DocumentContent doc, Indexer indexer, String[] stopWordsArray, boolean debug, boolean stemming, boolean stopWords, boolean bolleanIndex){
         this.doc = doc;
         this.indexer = indexer;
         this.tokenizer = new Tokenizer(stopWordsArray, stemming, stopWords, debug);
         this.debug = debug;
-        this.booleanIndex = booleanIndex;
+        this.booleanIndex = bolleanIndex;
     }
 
     @Override

@@ -16,10 +16,10 @@ import java.util.logging.Logger;
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class TI_Manager extends Thread{
-    private boolean debug;
-    private boolean stemming;
-    private boolean stopWords;
-    private boolean bolleanIndex;
+    private final boolean debug;
+    private final boolean stemming;
+    private final boolean stopWords;
+    private final boolean bolleanIndex;
     private final String[] stopWordsArray;
     private final DocumentProcessor docProc;
     private final Indexer indexer;

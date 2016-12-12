@@ -18,11 +18,11 @@ import org.apache.commons.io.filefilter.TrueFileFilter;
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class CorpusReader {
-    private String [] ignoreExtensions;
+    private final String [] ignoreExtensions;
     
     private int currentFile;
     private boolean finishedReadDir;
-    private ArrayList<CorpusFile> files;
+    private final ArrayList<CorpusFile> files;
     
     private CorpusFile[] corpusIterator;
     

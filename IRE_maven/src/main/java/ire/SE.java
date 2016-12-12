@@ -5,7 +5,6 @@
  */
 package ire;
 
-import ire.Objects.Result;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.fxml.FXMLLoader;
@@ -14,7 +13,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 /**
  *
- * @author bernardo
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
+ * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class SE extends Application{
     

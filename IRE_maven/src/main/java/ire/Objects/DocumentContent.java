@@ -12,10 +12,10 @@ package ire.Objects;
 public class DocumentContent {
     private static int id = 0;
 
-    private int docId;
-    private String filePath;
-    private int startLine;
-    private String content;
+    private final int docId;
+    private final String filePath;
+    private final int startLine;
+    private final String content;
     
     public DocumentContent(String content, String filePath, int startLine){
         this.content = content;

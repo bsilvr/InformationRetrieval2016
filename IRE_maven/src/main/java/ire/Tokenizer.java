@@ -17,9 +17,8 @@ import org.tartarus.snowball.ext.englishStemmer;
 public class Tokenizer {
     private final Pattern pattern = Pattern.compile("\\W");
     private final Pattern space_char = Pattern.compile("\\s+|[-()\\./_]");
-    private boolean stemming;
-    private boolean removeStopWords;
-    private boolean debug;
+    private final boolean stemming;
+    private final boolean removeStopWords;
     private final ArrayList<String> tokens;
     String [] stopWordsList;
     englishStemmer stemmer;
@@ -28,7 +27,6 @@ public class Tokenizer {
         this.stopWordsList = stopWordsList;
         this.stemmer = new englishStemmer();
         this.tokens = new ArrayList<>();
-        this.debug = debug;
         this.stemming = stemming;
         this.removeStopWords = removeStopWords;
     }
@@ -36,7 +34,6 @@ public class Tokenizer {
         this.stopWordsList = stopWordsList;
         this.stemmer = new englishStemmer();
         this.tokens = new ArrayList<>();
-        this.debug = false;
         this.stemming = stemming;
         this.removeStopWords = removeStopWords;
     }
@@ -44,7 +41,6 @@ public class Tokenizer {
         this.stopWordsList = stopWordsList;
         this.stemmer = new englishStemmer();
         this.tokens = new ArrayList<>();
-        this.debug = debug;
         this.stemming = true;
         this.removeStopWords = true;
     }
@@ -53,11 +49,11 @@ public class Tokenizer {
         
         String [] words = space_char.split(content);
         String word;
-        for(int i = 0; i < words.length; i++){
-            word = transform(words[i]);
+        for (String word1 : words) {
+            word = transform(word1);
             if(word != null){
                 tokens.add(word);
-            } 
+            }
         }         
         return tokens.toArray(new String[0]);  
     }
@@ -93,9 +89,6 @@ public class Tokenizer {
     // http://www.programcreek.com/2014/04/check-if-array-contains-a-value-java/
     public static boolean useArraysBinarySearch(String[] arr, String targetValue) {	
 	int a =  Arrays.binarySearch(arr, targetValue);
-	if(a > 0)
-            return true;
-	else
-            return false;
+        return a > 0;
     }
 }

@@ -7,13 +7,14 @@ package ire.Objects;
 
 /**
  *
- * @author bernardo
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
+ * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class Result {
 
-    private int docId;
-    private String filePath;
-    private int startLine;
+    private final int docId;
+    private final String filePath;
+    private final int startLine;
     private double score;
     
     public Result(String filePath, int startLine, int docId, double score){
@@ -58,9 +59,18 @@ public class Result {
     public boolean equals(Object o){
         if(o == null) return false;
         if(this == o) return true;
+        if (getClass() != o.getClass()) return false;
         Result tmp = (Result)o;
         return this.docId == tmp.getDocId();
         
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 23 * hash + this.docId;
+        hash = 23 * hash + (int) (Double.doubleToLongBits(this.score) ^ (Double.doubleToLongBits(this.score) >>> 32));
+        return hash;
     }
     
     @Override

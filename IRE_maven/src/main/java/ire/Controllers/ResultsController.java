@@ -1,4 +1,4 @@
-package ire;
+package ire.Controllers;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -8,15 +8,11 @@ package ire;
 
 import ire.Objects.Cache;
 import ire.Objects.Result;
-import java.awt.event.MouseEvent;
+import ire.Searcher;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.beans.property.SimpleListProperty;
-import javafx.collections.ObservableList;
-import javafx.collections.ObservableListBase;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -34,11 +30,10 @@ import javafx.stage.StageStyle;
 /**
  * FXML Controller class
  *
- * @author bernardo
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
+ * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class ResultsController implements Initializable {
-
-    private static String query;
     
     @FXML private TableView<Result> tableView;
     
@@ -55,21 +50,40 @@ public class ResultsController implements Initializable {
     private Searcher searcher;
     /**
      * Initializes the controller class.
+     * @param url
+     * @param rb
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        // Config
+        
+        // Results per page
+        int numResults = 10;
+        
+        // Max indexes in memory
+        int maxIndex = 10;
+        
+        // Verbose prints
+        boolean debug = false;
+        
+        // Path for the binary Words file
+        String wordsPath = "indexes/other/words";
+        
+        // Path for the binary documents list file
+        String docsPath = "indexes/other/documents_final";
+        
+        // Base path for the binary indexes files
+        String indexPath = "indexes/final_index_";
+        
+        // Path for the binary files mapping file
+        String filesMapPath = "indexes/other/fileMapping";
+        
+        // Path for the stopwords file
+        String stopWordsFile = "stopwords_en.txt";
+        
         page = 1;
         Cache cache = new Cache();
         String query = cache.getQuery();
-        int numResults = 10;
-        int maxIndex = 10;
-        boolean debug = false;
-        String wordsPath = "indexes/other/words";
-        String docsPath = "indexes/other/documents_final";
-        String indexPath = "indexes/final_index_";
-        String filesMapPath = "indexes/other/fileMapping";
-        String stopWordsFile = "stopwords_en.txt";
            
         searcher = new Searcher(indexPath, stopWordsFile, numResults, maxIndex, debug);
         searcher.loadWords(wordsPath);
@@ -78,9 +92,9 @@ public class ResultsController implements Initializable {
         Result[] results = searcher.search(query);
         
         pageCount.setText("Page: " + page + "/"+ searcher.getPageCount());
-        docId.setCellValueFactory(new PropertyValueFactory<Result, String>("docId"));
-        file.setCellValueFactory(new PropertyValueFactory<Result, String>("filePath"));
-        score.setCellValueFactory(new PropertyValueFactory<Result, String>("score"));
+        docId.setCellValueFactory(new PropertyValueFactory<>("docId"));
+        file.setCellValueFactory(new PropertyValueFactory<>("filePath"));
+        score.setCellValueFactory(new PropertyValueFactory<>("score"));
 
         tableView.getItems().setAll(results);
         
@@ -94,9 +108,9 @@ public class ResultsController implements Initializable {
         if (results != null){
             
             pageCount.setText("Page: " + page + "/"+ searcher.getPageCount());
-            docId.setCellValueFactory(new PropertyValueFactory<Result, String>("docId"));
-            file.setCellValueFactory(new PropertyValueFactory<Result, String>("filePath"));
-            score.setCellValueFactory(new PropertyValueFactory<Result, String>("score"));
+            docId.setCellValueFactory(new PropertyValueFactory<>("docId"));
+            file.setCellValueFactory(new PropertyValueFactory<>("filePath"));
+            score.setCellValueFactory(new PropertyValueFactory<>("score"));
             tableView.getItems().setAll(results);
         }
     }
@@ -108,9 +122,9 @@ public class ResultsController implements Initializable {
         if (results != null){
 
             pageCount.setText("Page: " + page + "/"+ searcher.getPageCount());
-            docId.setCellValueFactory(new PropertyValueFactory<Result, String>("docId"));
-            file.setCellValueFactory(new PropertyValueFactory<Result, String>("filePath"));
-            score.setCellValueFactory(new PropertyValueFactory<Result, String>("score"));
+            docId.setCellValueFactory(new PropertyValueFactory<>("docId"));
+            file.setCellValueFactory(new PropertyValueFactory<>("filePath"));
+            score.setCellValueFactory(new PropertyValueFactory<>("score"));
             tableView.getItems().setAll(results);
         }
     }

@@ -17,7 +17,7 @@ import ire.Objects.DocumentContent;
  */
 public class DocumentProcessor {
     private Processor proc;
-    private Buffer buffer;
+    private final Buffer buffer;
     
     public DocumentProcessor(int nBuffer){
         this.buffer = new Buffer(nBuffer);

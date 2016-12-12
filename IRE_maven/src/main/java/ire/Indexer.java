@@ -18,10 +18,10 @@ public class Indexer {
     private static Index index;
     private static DocumentList documents;
     
-    private int writeThreshold;
+    private final int writeThreshold;
     private static Runtime runtime = Runtime.getRuntime();
     private static int mb = 1024*1024;
-    private boolean debug;
+    private final boolean debug;
     
     public Indexer(){
         if(index == null){
@@ -79,9 +79,9 @@ public class Indexer {
     }
     
     public void indexToken(int docId, HashMap<String,Double> weight, double doc_weight){
-        for(HashMap.Entry<String, Double> entry : weight.entrySet()){
+        weight.entrySet().stream().forEach((entry) -> {
             index.addTerm(entry.getKey(), docId, weight.get(entry.getKey())/doc_weight);
-        }
+        });
 
         if ((docId % writeThreshold == 0 && docId != 0) ){
             if(debug){

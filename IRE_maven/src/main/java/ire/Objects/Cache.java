@@ -7,7 +7,8 @@ package ire.Objects;
 
 /**
  *
- * @author bernardo
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
+ * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class Cache {
     private static String query;
@@ -21,9 +22,9 @@ public class Cache {
         return content;
     }
     public void setQuery(String query){
-        this.query = query;
+        Cache.query = query;
     }
     public void setContent(String content){
-        this.content = content;
+        Cache.content = content;
     }
 }

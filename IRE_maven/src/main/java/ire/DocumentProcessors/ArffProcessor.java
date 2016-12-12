@@ -6,6 +6,7 @@
 package ire.DocumentProcessors;
 /**
  *
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class ArffProcessor {

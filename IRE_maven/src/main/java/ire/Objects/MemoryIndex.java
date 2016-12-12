@@ -9,11 +9,12 @@ import java.util.HashMap;
 
 /**
  *
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class MemoryIndex {
-    private char initial;
-    private HashMap<Integer, HashMap<Integer,Double>> index;
+    private final char initial;
+    private final HashMap<Integer, HashMap<Integer,Double>> index;
     
     public MemoryIndex(char i, HashMap<Integer, HashMap<Integer,Double>> idx){
         this.initial = i;
@@ -41,7 +42,17 @@ public class MemoryIndex {
         else if(this==o){
             return true;
         }
+        else if (getClass() != o.getClass()){
+            return false;
+        }
         MemoryIndex e = (MemoryIndex)o;
         return this.initial == e.initial;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 47 * hash + this.initial;
+        return hash;
     }
 }

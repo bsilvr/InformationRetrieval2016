@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -32,6 +33,7 @@ import org.nustaq.serialization.FSTObjectInput;
 
 /**
  *
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class Searcher {
@@ -63,11 +65,9 @@ public class Searcher {
     private Result[] hash2array(HashMap<Integer, Double> scores){
         Comparator<Result> comparator = (Result a, Result b) -> a.compareTo(b);
         SortedSet<Result> resul = new TreeSet<>(comparator);
-        for(HashMap.Entry<Integer, Double> e : scores.entrySet()){ 
-            
+        scores.entrySet().stream().forEach((e) -> {
             resul.add(new Result(filesMapping.getKey(documents.get(e.getKey()).getLeft()), documents.get(e.getKey()).getRight(),  e.getKey(),e.getValue()));
-
-        }
+        });
         results = resul.toArray(new Result[0]);
         return Arrays.copyOfRange(results, 0, numResults);
     }
@@ -87,24 +87,23 @@ public class Searcher {
         
         
         HashMap<Integer, Double> scores = new HashMap<>();
-        for(HashMap.Entry<String, Double> entry : queryWeights.entrySet()){ 
+        queryWeights.entrySet().stream().forEach((Map.Entry<String, Double> entry) -> {
             HashMap<Integer, Double> postList = getPostingList(entry.getKey());
-            if(postList == null){
-                continue;
-            }
-            for(HashMap.Entry<Integer, Double> e : postList.entrySet()){
-                double tmpScore = entry.getValue()*e.getValue();
-                
-                if(scores.containsKey(e.getKey())){
-                   tmpScore += scores.get(e.getKey());
-                   scores.put(e.getKey(), tmpScore);
-                }
-                else{
-                    scores.put(e.getKey(), tmpScore);
+            if (!(postList == null)) {
+                postList.entrySet().stream().forEach((e) -> {
+                    double tmpScore = entry.getValue()*e.getValue();
                     
-                }
+                    if(scores.containsKey(e.getKey())){
+                        tmpScore += scores.get(e.getKey());
+                        scores.put(e.getKey(), tmpScore);
+                    }
+                    else{
+                        scores.put(e.getKey(), tmpScore);
+                        
+                    }
+                });
             }
-        }
+        });
         return scores;
     }
     
@@ -163,19 +162,16 @@ public class Searcher {
             }
             double doc_length = Math.sqrt(sum);
             
-            for(HashMap.Entry<String, Double> entry : weights.entrySet()){ 
-                
+            weights.entrySet().stream().forEach((entry) -> {
                 weights.put(entry.getKey(), entry.getValue()/doc_length);
-            }
+        });
             return weights;
     }
     
     
     public void loadWords(String wordsPath){
-        try {
-            FSTObjectInput in = new FSTObjectInput(new FileInputStream(wordsPath));
+        try (FSTObjectInput in = new FSTObjectInput(new FileInputStream(wordsPath))) {
             words = (BidiMap<String, Integer>)in.readObject();
-            in.close();
             
         } catch (IOException | ClassNotFoundException ex) {
         }
@@ -206,7 +202,6 @@ public class Searcher {
         }
         return stopWordsList.toArray(new String[0]);
     }
-    
    
     public String getContent(Result r){
         int startLine = r.getStartLine();

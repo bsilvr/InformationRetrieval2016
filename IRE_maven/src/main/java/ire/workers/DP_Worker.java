@@ -14,9 +14,9 @@ import ire.Objects.CorpusFile;
  * @author Bruno Silva <brunomiguelsilva@ua.pt>
  */
 public class DP_Worker extends Thread{
-    private boolean debug;
-    private CorpusReader corpus;
-    private DocumentProcessor docProc;
+    private final boolean debug;
+    private final CorpusReader corpus;
+    private final DocumentProcessor docProc;
     
     public DP_Worker(CorpusReader corpus, DocumentProcessor docProc, boolean debug){
         this.corpus = corpus;

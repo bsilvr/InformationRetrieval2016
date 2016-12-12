@@ -1,7 +1,6 @@
-package ire;
+package ire.Controllers;
 
 import ire.Objects.Cache;
-import ire.Objects.Result;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -16,6 +15,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+/**
+ * FXML Controller class
+ *
+ * @author Bernardo Ferreira <bernardomrferreira@ua.pt>
+ * @author Bruno Silva <brunomiguelsilva@ua.pt>
+ */
 public class FXMLController implements Initializable {
     
     @FXML
@@ -43,14 +48,10 @@ public class FXMLController implements Initializable {
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.show();
-        
-       
-        
-        
+          
     }
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
     }    
 }
