@@ -136,9 +136,8 @@ public class ResultsController implements Initializable {
     @FXML
     private void handleOpen(ActionEvent event) throws IOException {
         Cache cache = new Cache();
-        cache.setContent(tableView.getSelectionModel().getSelectedItem());
         Result result = tableView.getSelectionModel().getSelectedItem();
-        System.out.println(result.getDocId());   
+        cache.setContent(searcher.getContent(result));
         
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/Content.fxml"));
             Parent root1 = (Parent) fxmlLoader.load();

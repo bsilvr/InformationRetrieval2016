@@ -5,6 +5,7 @@
  */
 package ire;
 
+import ire.Objects.Cache;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -13,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -25,7 +27,7 @@ import javafx.stage.Stage;
 public class ContentController implements Initializable {
 
     @FXML private Button close;
-    @FXML private WebView web;
+    @FXML private TextArea content;
 
 
     /**
@@ -33,11 +35,9 @@ public class ContentController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        web = new WebView();
-        final WebEngine webEngine = web.getEngine();
-
+        Cache cache = new Cache();
         
-        webEngine.load("http://www.oracle.com/products/index.html");
+        content.setText(cache.getContent());
     }    
     
     @FXML
