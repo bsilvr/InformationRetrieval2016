@@ -5,7 +5,7 @@
  */
 package ire;
 
-import ire.Objects.Index;
+import ire.Objects.MemoryIndex;
 import ire.Objects.Result;
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,8 +18,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.lang3.tuple.Pair;
@@ -31,26 +29,21 @@ import org.nustaq.serialization.FSTObjectInput;
  */
 public class Searcher {
     private HashMap<Integer, Pair<Integer,Integer>> documents;
-    private HashMap<Integer, HashMap<Integer,Double>> index;
     private BidiMap<String,Integer> filesMapping;
     private BidiMap<String, Integer> words;
     private Result[] results;
     private final Tokenizer tokenizer;
     private final int numResults;
-    
-    private final String indexPath;
-    
-    public Searcher(String indexPath, String stopWordsFile, int numResults, boolean debug){
+    private final MemoryIndexManager indexManager;
+        
+    public Searcher(String indexPath, String stopWordsFile, int numResults, int maxIndex, boolean debug){
         documents = new HashMap<>();
-        index = new HashMap<>();
         filesMapping = new DualHashBidiMap();
         words = new DualHashBidiMap();
         results = null;
         tokenizer = new Tokenizer(loadStopWords(stopWordsFile), debug);
         this.numResults = numResults;
-        
-        this.indexPath = indexPath;
-        
+        this.indexManager = new MemoryIndexManager(maxIndex, indexPath);        
     }
     
     public Result[] search(String query){
@@ -74,7 +67,12 @@ public class Searcher {
         return Arrays.copyOfRange(results, 0, numResults);
     }
             
-                        
+    public Result[] getResultsPage(int page){
+        if(numResults*page > results.length){
+            return null;
+        }
+        return Arrays.copyOfRange(results, numResults*(page-1), numResults*page);
+    }
 
     private HashMap<Integer, Double> calculateResult(HashMap<String, Double> queryWeights){
         
@@ -82,6 +80,9 @@ public class Searcher {
         HashMap<Integer, Double> scores = new HashMap<>();
         for(HashMap.Entry<String, Double> entry : queryWeights.entrySet()){ 
             HashMap<Integer, Double> postList = getPostingList(entry.getKey());
+            if(postList == null){
+                continue;
+            }
             for(HashMap.Entry<Integer, Double> e : postList.entrySet()){
                 double tmpScore = entry.getValue()*e.getValue();
                 
@@ -101,7 +102,11 @@ public class Searcher {
     private HashMap<String, Double> calculateIdf(String [] tokens){
         HashMap<String, Double> idfs = new HashMap<>();
         for(String s : tokens){
-            idfs.put(s, Math.log(documents.size()/getPostingList(s).size()));
+            HashMap<Integer, Double> postList = getPostingList(s);
+            if(postList == null){
+                continue;
+            }
+            idfs.put(s, Math.log(documents.size()/postList.size()));
         }
         return idfs;
     }
@@ -115,8 +120,8 @@ public class Searcher {
         else return null;
         // Classe para guardar indices em memoria
         //TODO
-        loadIndex(term.charAt(0));
-        
+        MemoryIndex i = indexManager.loadIndex(term.charAt(0));
+        HashMap<Integer, HashMap<Integer,Double>> index = i.getIndex();
         if(index.containsKey(termId)){
             return index.get(termId);
         }
@@ -156,16 +161,6 @@ public class Searcher {
             return weights;
     }
     
-    private void loadIndex(char initial){
-        try {
-            FSTObjectInput in = new FSTObjectInput(new FileInputStream(indexPath + initial));
-            index = (HashMap<Integer, HashMap<Integer,Double>>)in.readObject();
-            in.close();
-            
-        } catch (IOException | ClassNotFoundException ex) {
-            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
     
     public void loadWords(String wordsPath){
         try {
@@ -174,7 +169,6 @@ public class Searcher {
             in.close();
             
         } catch (IOException | ClassNotFoundException ex) {
-            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -189,7 +183,6 @@ public class Searcher {
             in.close();
             
         } catch (IOException | ClassNotFoundException ex) {
-            Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
