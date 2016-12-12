@@ -1,6 +1,6 @@
 package ire;
 
-import ire.Objects.Query;
+import ire.Objects.Cache;
 import ire.Objects.Result;
 import java.io.IOException;
 import java.net.URL;
@@ -28,7 +28,8 @@ public class FXMLController implements Initializable {
     @FXML
     private void handleButtonAction(ActionEvent event) throws IOException {
         
-        Query qry = new Query(query.getText());
+        Cache cache = new Cache();
+        cache.setQuery(query.getText());
         Stage stage ;
         Parent root;
          

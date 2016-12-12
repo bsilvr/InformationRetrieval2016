@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.web.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
 <?import javafx.scene.*?>
@@ -12,20 +13,26 @@
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                <children>
-                  <TableView fx:id="tableView" layoutX="45.0" layoutY="19.0" prefHeight="304.0" prefWidth="509.0">
-                    <columns>
-                      <TableColumn fx:id="docId" prefWidth="75.0" text="Doc ID" />
-                      <TableColumn fx:id="file" prefWidth="228.0" text="File" />
-                      <TableColumn fx:id="score" prefWidth="205.0" text="Score" />
-                    </columns>
-                  </TableView>
+                  <SplitPane layoutX="45.0" layoutY="19.0">
+                     <items>
+                        <TableView fx:id="tableView" layoutX="45.0" layoutY="19.0" prefHeight="304.0" prefWidth="509.0">
+                          <columns>
+                            <TableColumn fx:id="docId" prefWidth="75.0" text="Doc ID" />
+                            <TableColumn fx:id="file" prefWidth="228.0" text="File" />
+                            <TableColumn fx:id="score" prefWidth="205.0" text="Score" />
+                          </columns>
+                        </TableView>
+                     </items>
+                  </SplitPane>
                </children>
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                <children>
                   <Button fx:id="previous" layoutX="223.0" layoutY="13.0" mnemonicParsing="false" onAction="#handlePrevious" text="Previous" />
                   <Button fx:id="next" layoutX="305.0" layoutY="13.0" mnemonicParsing="false" onAction="#handleNext" prefHeight="27.0" prefWidth="71.0" text="Next" />
-                  <Label fx:id="pageCount" layoutX="388.0" layoutY="18.0" prefHeight="17.0" prefWidth="96.0" text="Page " />
+                  <Label fx:id="pageCount" layoutX="388.0" layoutY="18.0" prefHeight="17.0" prefWidth="96.0" text="Page" />
+                  <Button fx:id="back" layoutX="14.0" layoutY="13.0" mnemonicParsing="false" onAction="#handleBack" text="Back" />
+                  <Button fx:id="open" layoutX="534.0" layoutY="13.0" mnemonicParsing="false" onAction="#handleOpen" text="Open" />
                </children>
             </AnchorPane>
         </items>

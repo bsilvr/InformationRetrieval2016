@@ -9,17 +9,26 @@ package ire.Objects;
  *
  * @author bernardo
  */
-public class Query {
+public class Cache {
     private static String query;
+    private static String content;
     
-    public Query(String query){
-        this.query = query;
-    }
-    public Query(){
+    
+    public Cache(){
         
     }
     
     public String getQuery(){
         return query;
+    }
+    
+    public String getContent(){
+        return content;
+    }
+    public void setQuery(String query){
+        this.query = query;
+    }
+    public void setContent(String content){
+        this.content = content;
     }
 }
