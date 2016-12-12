@@ -57,9 +57,7 @@ public class Searcher {
         String [] tokens = tokenizer.tokenize(query);
         HashMap<String, Double> idfs = calculateIdf(tokens);
         HashMap<String, Double> queryWeights = calculateWeight(tokens, idfs);
-        results = hash2array(calculateResult(queryWeights));
-        
-        return results;
+        return hash2array(calculateResult(queryWeights));
     }
     
     private Result[] hash2array(HashMap<Integer, Double> scores){
