@@ -75,7 +75,7 @@ public class Searcher {
     }
             
     public Result[] getResultsPage(int page){
-        if(numResults*page > results.length){
+        if(numResults*page > results.length || page < 1){
             return null;
         }
         return Arrays.copyOfRange(results, numResults*(page-1), numResults*page);
