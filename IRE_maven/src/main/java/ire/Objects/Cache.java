@@ -13,11 +13,6 @@ public class Cache {
     private static String query;
     private static String content;
     
-    
-    public Cache(){
-        
-    }
-    
     public String getQuery(){
         return query;
     }
