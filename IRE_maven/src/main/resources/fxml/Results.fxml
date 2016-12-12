@@ -6,13 +6,28 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="ire.ResultsController">
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ire.ResultsController">
    <children>
-      <ScrollPane layoutX="180.0" layoutY="89.0" prefHeight="200.0" prefWidth="200.0">
-        <content>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
-        </content>
-      </ScrollPane>
+      <SplitPane dividerPositions="0.8567839195979899" orientation="VERTICAL" prefHeight="400.0" prefWidth="600.0">
+        <items>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+               <children>
+                  <TableView fx:id="tableView" layoutX="45.0" layoutY="19.0" prefHeight="304.0" prefWidth="509.0">
+                    <columns>
+                      <TableColumn fx:id="docId" prefWidth="75.0" text="Doc ID" />
+                      <TableColumn fx:id="file" prefWidth="228.0" text="File" />
+                      <TableColumn fx:id="score" prefWidth="205.0" text="Score" />
+                    </columns>
+                  </TableView>
+               </children>
+            </AnchorPane>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+               <children>
+                  <Button fx:id="previous" layoutX="223.0" layoutY="13.0" mnemonicParsing="false" onAction="#handlePrevious" text="Previous" />
+                  <Button fx:id="next" layoutX="305.0" layoutY="13.0" mnemonicParsing="false" onAction="#handleNext" prefHeight="27.0" prefWidth="71.0" text="Next" />
+               </children>
+            </AnchorPane>
+        </items>
+      </SplitPane>
    </children>
 </AnchorPane>
