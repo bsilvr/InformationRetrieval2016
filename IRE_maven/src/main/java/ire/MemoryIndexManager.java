@@ -20,12 +20,12 @@ import org.nustaq.serialization.FSTObjectInput;
 public class MemoryIndexManager {
     private final int maxIndex;
     private final String indexPath;
-    Queue<MemoryIndex> indexes;
+    private final Queue<MemoryIndex> indexes;
     
     public MemoryIndexManager(int maxIndex, String indexPath){
         this.maxIndex = maxIndex;
         this.indexPath = indexPath;
-        indexes = new CircularFifoQueue<>(maxIndex);
+        this.indexes = new CircularFifoQueue<>(maxIndex);
     }
     
     public MemoryIndex loadIndex(char initial){
