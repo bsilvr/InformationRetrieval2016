@@ -5,6 +5,7 @@
  */
 package ire;
 
+import ire.DocumentProcessors.CsvProcessor;
 import ire.Objects.MemoryIndex;
 import ire.Objects.Result;
 import java.io.BufferedReader;
@@ -12,14 +13,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.tuple.Pair;
 import org.nustaq.serialization.FSTObjectInput;
 
@@ -198,5 +205,30 @@ public class Searcher {
         return stopWordsList.toArray(new String[0]);
     }
     
-    
+   
+    public String getContent(String file, int startLine){
+        try {
+            StringBuilder currentDoc = new StringBuilder();
+            File cf = new File(file);
+            Charset utf8charset = Charset.forName("UTF-8");
+            CSVParser parser;
+            int nLine = 0;
+            parser = CSVParser.parse(cf, utf8charset, CSVFormat.DEFAULT);
+            for (CSVRecord csvRecord : parser) {
+                if(nLine == startLine){ 
+                    currentDoc.append(csvRecord.get(5));
+                    try{ 
+                        currentDoc.append(" ");
+                        currentDoc.append(csvRecord.get(6));
+                    }catch(ArrayIndexOutOfBoundsException e) {
+                    }
+                    return currentDoc.toString();
+                }
+                nLine++;
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(CsvProcessor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
 }
