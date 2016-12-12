@@ -6,33 +6,44 @@
 package ire;
 
 import ire.Objects.Result;
-
+import javafx.application.Application;
+import static javafx.application.Application.launch;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 /**
  *
  * @author bernardo
  */
-public class SE {
+public class SE extends Application{
+    
+    @Override
+    public void start(Stage stage) throws Exception {
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/Scene.fxml"));
+        
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add("/styles/Styles.css");
+        
+        stage.setTitle("JavaFX and Maven");
+        stage.setScene(scene);
+        stage.show();
+    }
     
     public static void main(String [] args){
         
-        int maxIndex = 10;
-        int numResults = 100;
-        boolean debug = false;
-        String wordsPath = "indexes/other/words";
-        String docsPath = "indexes/other/documents_final";
-        String indexPath = "indexes/final_index_";
-        String filesMapPath = "indexes/other/fileMapping";
-        String stopWordsFile = "stopwords_en.txt";
-        
-        Searcher searcher = new Searcher(indexPath, stopWordsFile, numResults, maxIndex, debug);
-        searcher.loadWords(wordsPath);
-        searcher.loadDocs(docsPath, filesMapPath);
-        
-        String query = "java class tostring";
-        Result[] results = searcher.search(query);
-        for(Result a  : results){
-            System.out.println(a);
-        }
+        launch(args);
                    
     }
 }
+
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add("/styles/Styles.css");
+        
+        stage.setTitle("JavaFX and Maven");
+        stage.setScene(scene);
+        stage.show();
+    }
+    
+    public static void main(String [] args){
+        launch(args);
