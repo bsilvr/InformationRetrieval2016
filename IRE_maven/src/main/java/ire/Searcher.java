@@ -78,6 +78,10 @@ public class Searcher {
         }
         return Arrays.copyOfRange(results, numResults*(page-1), numResults*page);
     }
+    
+    public int getPageCount(){
+        return results.length/numResults;
+    }
 
     private HashMap<Integer, Double> calculateResult(HashMap<String, Double> queryWeights){
         
