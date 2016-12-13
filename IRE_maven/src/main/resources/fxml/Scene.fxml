@@ -6,7 +6,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="200" prefWidth="320" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ire.FXMLController">
+<AnchorPane id="AnchorPane" prefHeight="200" prefWidth="320" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ire.Controllers.FXMLController">
     <children>
         <Button fx:id="button" layoutX="130.0" layoutY="87.0" onAction="#handleButtonAction" text="Search" />
         <Label fx:id="label" layoutX="109.0" layoutY="22.0" minHeight="16" minWidth="69" text="Enter your query" />
