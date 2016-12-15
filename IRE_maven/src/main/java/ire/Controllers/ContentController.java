@@ -9,11 +9,18 @@ import ire.Objects.Cache;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.regex.Pattern;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
+import javafx.scene.web.HTMLEditor;
 import javafx.stage.Stage;
 
 /**
@@ -25,7 +32,7 @@ import javafx.stage.Stage;
 public class ContentController implements Initializable {
 
     @FXML private Button close;
-    @FXML private TextArea content;
+    @FXML private HTMLEditor content;
 
 
     /**
@@ -37,7 +44,9 @@ public class ContentController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         Cache cache = new Cache();
         
-        content.setText(cache.getContent());
+        hideHTMLEditorToolbars(content);
+  
+        content.setHtmlText(cache.getContent());
     }    
     
     @FXML
@@ -46,5 +55,27 @@ public class ContentController implements Initializable {
         // do what you have to do
         stage.close();
     }
+    
+    
+
+  public static void hideHTMLEditorToolbars(final HTMLEditor editor)
+{
+    editor.setVisible(false);
+    Platform.runLater(new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            Node[] nodes = editor.lookupAll(".tool-bar").toArray(new Node[0]);
+            for(Node node : nodes)
+            {
+                node.setVisible(false);
+                node.setManaged(false);
+            }
+            editor.setVisible(true);
+        }
+    });
+}
+
     
 }

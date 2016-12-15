@@ -47,6 +47,7 @@ public class FXMLController implements Initializable {
         //create a new scene with root and set the stage
         Scene scene = new Scene(root);
         stage.setScene(scene);
+        stage.setTitle("IR - Searcher");
         stage.show();
           
     }

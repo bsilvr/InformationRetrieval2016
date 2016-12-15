@@ -15,7 +15,7 @@
                <children>
                   <SplitPane layoutX="45.0" layoutY="19.0">
                      <items>
-                        <TableView fx:id="tableView" layoutX="45.0" layoutY="19.0" prefHeight="304.0" prefWidth="509.0">
+                        <TableView fx:id="tableView" layoutX="45.0" layoutY="19.0" prefHeight="280.0" prefWidth="509.0">
                           <columns>
                             <TableColumn fx:id="docId" prefWidth="75.0" text="Doc ID" />
                             <TableColumn fx:id="file" prefWidth="228.0" text="File" />
@@ -24,6 +24,7 @@
                         </TableView>
                      </items>
                   </SplitPane>
+                  <Label fx:id="time" layoutX="45.0" layoutY="310.0" text="Time" />
                </children>
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">

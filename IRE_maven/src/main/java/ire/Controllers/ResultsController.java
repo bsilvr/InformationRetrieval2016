@@ -45,6 +45,7 @@ public class ResultsController implements Initializable {
     @FXML private Button back;
     @FXML private Button open;
     @FXML private Label pageCount;
+    @FXML private Label time;
     
     private int page;
     private Searcher searcher;
@@ -56,7 +57,8 @@ public class ResultsController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // Config
-        
+        double endTime, totalTime, startTime;
+
         // Results per page
         int numResults = 10;
         
@@ -84,13 +86,21 @@ public class ResultsController implements Initializable {
         page = 1;
         Cache cache = new Cache();
         String query = cache.getQuery();
-           
+
+         
+        
         searcher = new Searcher(indexPath, stopWordsFile, numResults, maxIndex, debug);
         searcher.loadWords(wordsPath);
         searcher.loadDocs(docsPath, filesMapPath);
         
+        startTime = System.currentTimeMillis();  
         Result[] results = searcher.search(query);
         
+        endTime = System.currentTimeMillis();
+        totalTime = (endTime - startTime)/1000;
+        System.out.println("Finished Indexing: "+totalTime+" seconds.");
+        
+        time.setText("Search took "+ totalTime+ " seconds.");
         pageCount.setText("Page: " + page + "/"+ searcher.getPageCount());
         docId.setCellValueFactory(new PropertyValueFactory<>("docId"));
         file.setCellValueFactory(new PropertyValueFactory<>("filePath"));
@@ -158,7 +168,7 @@ public class ResultsController implements Initializable {
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.initStyle(StageStyle.UNDECORATED);
-            stage.setTitle("ABC");
+            stage.setTitle("IR - Searcher");
             stage.setScene(new Scene(root1));  
             stage.show();
     }
